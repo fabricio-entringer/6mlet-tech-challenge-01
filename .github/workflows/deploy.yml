@@ -33,6 +33,6 @@ jobs:
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
       - name: Deploy to Railway
-        run: railway up -- --project 6mlet-tech-challenge-01
+        run: railway up -- --project cad4673f-bd18-41ee-88c9-d61b74f9f705
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
