@@ -10,12 +10,17 @@ authors = [
     {name = "Fabricio Entringer", email = "fabricio@entringer.dev"},
 ]
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115.12",
     "uvicorn[standard]>=0.34.3",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["tests*", "assets*"]
 
 [project.optional-dependencies]
 test = [
