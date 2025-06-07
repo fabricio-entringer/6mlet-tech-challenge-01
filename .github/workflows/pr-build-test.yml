@@ -156,8 +156,15 @@ jobs:
         echo "- **Build**: ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Security Scan**: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Code Quality**: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
         
-        if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.build.result }}" == "success" ]; then
+        # Debug: Show actual values being compared
+        echo "Debug - Test result: '${{ needs.test.result }}'" >> $GITHUB_STEP_SUMMARY
+        echo "Debug - Build result: '${{ needs.build.result }}'" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Use more reliable conditional with single equals and proper quoting
+        if [ "${{ needs.test.result }}" = "success" ] && [ "${{ needs.build.result }}" = "success" ]; then
           echo "✅ All critical checks passed!" >> $GITHUB_STEP_SUMMARY
         else
           echo "❌ Some critical checks failed!" >> $GITHUB_STEP_SUMMARY
