@@ -32,6 +32,6 @@ async def test_endpoints_content_type():
     """Test that endpoints return JSON content type."""
     response = client.get("/")
     assert response.headers["content-type"] == "application/json"
-    
+
     response = client.get("/health")
     assert response.headers["content-type"] == "application/json"
