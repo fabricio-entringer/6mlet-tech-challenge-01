@@ -7,6 +7,7 @@
   <img src="assets/app-image.png" alt="6MLET Tech Challenge 01 Application" width="400">
 </div>
 
+<br/>
 Tech Challenge #1 - FIAP Machine Learning Engineering Postgraduate specialization course
 
 ## Overview
