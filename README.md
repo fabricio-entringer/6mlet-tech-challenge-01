@@ -86,22 +86,27 @@ pip install -r requirements.txt
 
 ## API Endpoints
 
+**🌐 Production URL**: <https://6mlet-tech-challenge-01.up.railway.app>
+
 ### Core Endpoints
 
 - **`GET /`** - Root endpoint
   - **Description**: Returns a welcome message for the API
   - **Response**: `{"message": "Welcome to 6MLET Tech Challenge 01 API"}`
   - **Status Code**: 200
+  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/>
 
 - **`GET /health`** - Health check endpoint
   - **Description**: Returns the current health status of the service
   - **Response**: `{"status": "healthy"}`
   - **Status Code**: 200
+  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/health>
 
 - **`GET /version`** - Version endpoint
   - **Description**: Returns the current application version from pyproject.toml
   - **Response**: `{"version": "x.x.x"}`
   - **Status Code**: 200
+  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/version>
 
 ### API Documentation
 
@@ -111,15 +116,18 @@ The FastAPI application automatically generates comprehensive API documentation 
   - Try out endpoints directly from the browser
   - View request/response schemas
   - Test API calls with real-time responses
+  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/docs>
 
 - **Alternative Documentation (ReDoc)**: `http://localhost:8000/redoc`
   - Clean, responsive documentation interface
   - Detailed endpoint descriptions and examples
   - Schema definitions and models
+  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/redoc>
 
 - **OpenAPI JSON Schema**: `http://localhost:8000/openapi.json`
   - Raw OpenAPI specification in JSON format
   - Can be imported into other API tools (Postman, Insomnia, etc.)
+  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/openapi.json>
 
 ## Testing
 
