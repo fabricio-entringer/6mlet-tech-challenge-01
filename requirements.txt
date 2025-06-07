@@ -1,0 +1,6 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.3
+pytest==8.4.0
+pytest-asyncio==1.0.0
+httpx==0.28.1
+commitizen==4.8.2

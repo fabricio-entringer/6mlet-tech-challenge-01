@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "6mlet-tech-challenge-01"
+description = "FastAPI application for 6MLET Tech Challenge 01"
+version = "0.0.1"
+authors = [
+    {name = "Fabricio Entringer", email = "fabricio@entringer.dev"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.12",
+    "uvicorn[standard]>=0.34.3",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.4.0",
+    "pytest-asyncio>=1.0.0",
+    "httpx>=0.28.1",
+]
+dev = [
+    "commitizen>=4.8.2",
+]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "v$version"
+version_scheme = "semver"
+version_provider = "commitizen"
+update_changelog_on_bump = true
+major_version_zero = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+python_classes = "Test*"
+addopts = "-v --tb=short"
+asyncio_mode = "auto"
