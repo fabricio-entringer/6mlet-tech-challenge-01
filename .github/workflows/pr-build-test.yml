@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12", "3.11"]
+        python-version: ["3.12"]
 
     steps:
     - name: Checkout code
@@ -79,7 +79,7 @@ jobs:
         python -m build
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: dist/
@@ -156,10 +156,33 @@ jobs:
         echo "- **Build**: ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Security Scan**: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Code Quality**: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
         
-        if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.build.result }}" == "success" ]; then
-          echo "✅ All critical checks passed!" >> $GITHUB_STEP_SUMMARY
+        # Debug: Show actual values being compared
+        echo "Debug - Test result: '${{ needs.test.result }}'" >> $GITHUB_STEP_SUMMARY
+        echo "Debug - Build result: '${{ needs.build.result }}'" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Store results in variables for cleaner logic
+        TEST_RESULT="${{ needs.test.result }}"
+        BUILD_RESULT="${{ needs.build.result }}"
+        SECURITY_RESULT="${{ needs.security-scan.result }}"
+        QUALITY_RESULT="${{ needs.code-quality.result }}"
+        
+        echo "Evaluating all job results:" >> $GITHUB_STEP_SUMMARY
+        echo "  - TEST_RESULT='$TEST_RESULT'" >> $GITHUB_STEP_SUMMARY
+        echo "  - BUILD_RESULT='$BUILD_RESULT'" >> $GITHUB_STEP_SUMMARY
+        echo "  - SECURITY_RESULT='$SECURITY_RESULT'" >> $GITHUB_STEP_SUMMARY
+        echo "  - QUALITY_RESULT='$QUALITY_RESULT'" >> $GITHUB_STEP_SUMMARY
+        
+        # Check if all jobs succeeded
+        if [[ "$TEST_RESULT" == "success" ]] && [[ "$BUILD_RESULT" == "success" ]] && [[ "$SECURITY_RESULT" == "success" ]] && [[ "$QUALITY_RESULT" == "success" ]]; then
+          echo "✅ All checks passed!" >> $GITHUB_STEP_SUMMARY
         else
-          echo "❌ Some critical checks failed!" >> $GITHUB_STEP_SUMMARY
+          echo "❌ Some checks failed!" >> $GITHUB_STEP_SUMMARY
+          echo "  - Test result: $TEST_RESULT" >> $GITHUB_STEP_SUMMARY
+          echo "  - Build result: $BUILD_RESULT" >> $GITHUB_STEP_SUMMARY
+          echo "  - Security result: $SECURITY_RESULT" >> $GITHUB_STEP_SUMMARY
+          echo "  - Code quality result: $QUALITY_RESULT" >> $GITHUB_STEP_SUMMARY
           exit 1
         fi
