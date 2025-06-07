@@ -3,6 +3,10 @@
 [![CI](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/CI/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
 [![Build and Test PR](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Build%20and%20Test%20PR/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
 
+<div align="center">
+  <img src="assets/app-image.png" alt="6MLET Tech Challenge 01 Application" width="400">
+</div>
+
 Tech Challenge #1 - FIAP Machine Learning Engineering Postgraduate specialization course
 
 ## Overview
