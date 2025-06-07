@@ -1,5 +1,5 @@
-import tomllib
 import os
+import tomllib
 
 
 def get_version() -> str:

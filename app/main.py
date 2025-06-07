@@ -1,5 +1,7 @@
-from fastapi import FastAPI
 from typing import Dict
+
+from fastapi import FastAPI
+
 from .utils import get_version
 
 app_version = get_version()
