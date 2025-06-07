@@ -1,0 +1,99 @@
+name: 📋 Task
+description: Create a task for project work or maintenance
+title: "[TASK] "
+labels: ["task", "triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Create a task to track project work, maintenance, documentation, or other activities.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Task Description
+      description: Clearly describe what needs to be done.
+      placeholder: This task involves...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Task Category
+      description: What type of task is this?
+      options:
+        - Development - Code implementation
+        - Documentation - Writing or updating docs
+        - Testing - Writing or updating tests
+        - Maintenance - Refactoring or cleanup
+        - DevOps - CI/CD, deployment, infrastructure
+        - Research - Investigation or planning
+        - Other - Specify in description
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this task?
+      options:
+        - Low - Can be done when time permits
+        - Medium - Should be completed soon
+        - High - Important and should be prioritized
+        - Critical - Urgent and blocking other work
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Estimated Effort
+      description: How much effort do you think this task will require?
+      options:
+        - Small - Less than 1 hour
+        - Medium - 1-4 hours
+        - Large - 4-8 hours
+        - Extra Large - More than 8 hours
+        - Unknown - Needs investigation
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Define what needs to be completed for this task to be considered done.
+      placeholder: |
+        - [ ] Criteria 1
+        - [ ] Criteria 2
+        - [ ] Criteria 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Provide any additional context, references, or background information.
+      placeholder: This task is needed because...
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List any dependencies or prerequisites for this task.
+      placeholder: This task depends on...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have clearly described the task and its requirements
+          required: true
+        - label: I have defined clear acceptance criteria
+          required: true
+        - label: I have checked for existing related issues
+          required: true

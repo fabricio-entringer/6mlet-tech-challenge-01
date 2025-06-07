@@ -1,0 +1,88 @@
+name: 🚀 Feature Request / Improvement
+description: Suggest an idea or improvement for this project
+title: "[IMPROVEMENT] "
+labels: ["enhancement", "triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please provide as much detail as possible to help us understand your request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem? Please describe the issue.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see implemented.
+      placeholder: I would like to see...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: Alternative approaches could be...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this improvement to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would be helpful
+        - High - Important for my use case
+        - Critical - Blocking my work
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple - Small change or addition
+        - Medium - Moderate effort required
+        - Complex - Significant development effort
+        - Unknown - Need more investigation
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case
+      description: Describe how this improvement would be used and who would benefit from it.
+      placeholder: This would help users who...
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, mockups, or examples about the feature request here.
+      placeholder: Additional information that might be helpful...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched for existing issues before creating this feature request
+          required: true
+        - label: I have provided a clear description of the problem and solution
+          required: true
+        - label: This improvement aligns with the project's goals
+          required: false

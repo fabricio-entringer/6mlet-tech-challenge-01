@@ -73,12 +73,45 @@ pip install -r requirements.txt
    ```
 
 2. The API will be available at: `http://localhost:8000`
-3. API documentation: `http://localhost:8000/docs`
+3. Interactive API documentation: `http://localhost:8000/docs`
+4. Alternative API documentation: `http://localhost:8000/redoc`
 
 ## API Endpoints
 
-- `GET /` - Welcome message
-- `GET /health` - Health check endpoint
+### Core Endpoints
+
+- **`GET /`** - Root endpoint
+  - **Description**: Returns a welcome message for the API
+  - **Response**: `{"message": "Welcome to 6MLET Tech Challenge 01 API"}`
+  - **Status Code**: 200
+
+- **`GET /health`** - Health check endpoint
+  - **Description**: Returns the current health status of the service
+  - **Response**: `{"status": "healthy"}`
+  - **Status Code**: 200
+
+- **`GET /version`** - Version endpoint
+  - **Description**: Returns the current application version from pyproject.toml
+  - **Response**: `{"version": "x.x.x"}`
+  - **Status Code**: 200
+
+### API Documentation
+
+The FastAPI application automatically generates comprehensive API documentation using OpenAPI (Swagger) specifications:
+
+- **Interactive Documentation (Swagger UI)**: `http://localhost:8000/docs`
+  - Try out endpoints directly from the browser
+  - View request/response schemas
+  - Test API calls with real-time responses
+
+- **Alternative Documentation (ReDoc)**: `http://localhost:8000/redoc`
+  - Clean, responsive documentation interface
+  - Detailed endpoint descriptions and examples
+  - Schema definitions and models
+
+- **OpenAPI JSON Schema**: `http://localhost:8000/openapi.json`
+  - Raw OpenAPI specification in JSON format
+  - Can be imported into other API tools (Postman, Insomnia, etc.)
 
 ## Testing
 
@@ -233,6 +266,30 @@ Key features:
    make commit   # Create conventional commit
    make bump     # Bump version when ready for release
    ```
+
+## Contributing
+
+We welcome contributions to this project! Whether you want to report a bug, suggest an improvement, or contribute code, please use our issue templates to get started.
+
+### 🐛 Report Issues
+
+Found a bug or want to suggest an improvement? Please create an issue using our templates:
+
+**[📝 Create New Issue](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/issues/new/choose)**
+
+Available issue types:
+- **🐛 Bug Report** - Report bugs or unexpected behavior
+- **🚀 Feature Request/Improvement** - Suggest new features or improvements
+- **📋 Task** - Create tasks for project work or maintenance
+
+### 📋 Issue Guidelines
+
+When creating an issue, please:
+- Use the appropriate template for your issue type
+- Provide clear and detailed information
+- Search existing issues to avoid duplicates
+- Include relevant environment information for bugs
+- Follow the project's code of conduct
 
 ## Requirements
 

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/fabricio-entringer/6mlet-tech-challenge-01/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📖 Documentation
+    url: https://github.com/fabricio-entringer/6mlet-tech-challenge-01#readme
+    about: Read the project documentation and setup instructions
