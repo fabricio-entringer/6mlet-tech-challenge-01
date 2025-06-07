@@ -1,0 +1,14 @@
+# CODEOWNERS file for 6mlet-tech-challenge-01
+# This file defines who owns the code in this repository
+# More info: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global rule - Fabricio Entringer owns all files in the repository
+* @fabricio-entringer
+* @adrianoribeiro
+
+# Specific rules (uncomment and modify as needed)
+# /app/ @fabricio-entringer
+# /tests/ @fabricio-entringer
+# *.py @fabricio-entringer
+# README.md @fabricio-entringer
+# requirements.txt @fabricio-entringer
