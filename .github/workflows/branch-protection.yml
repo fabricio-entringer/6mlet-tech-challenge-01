@@ -10,6 +10,7 @@ on:
 jobs:
   check-source-branch:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'master'
     steps:
     - name: Block non-develop merges
       if: github.event.pull_request.head.ref != 'develop'
