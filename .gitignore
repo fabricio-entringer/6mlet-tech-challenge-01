@@ -197,3 +197,16 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# GitHub Copilot instructions (local development only)
+.github/copilot-instructions.md
+.github/copilot-instructions.txt
+.github/copilot-instructions.*
+.copilotrc.md
+.copilotrc.txt
+.copilotrc.*
+COPILOT.md
+copilot-instructions.*
+
+# VS Code workspace settings (local development only)
+.vscode/
