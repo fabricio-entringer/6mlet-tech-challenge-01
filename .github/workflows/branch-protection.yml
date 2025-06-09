@@ -1,15 +1,16 @@
 # Simple branch protection for Issue #38
 # Only 'develop' branch can merge into 'master'
 
-name: Master Branch Protection
+name: Branch Protection
 
 on:
   pull_request:
-    branches: [master]
+    branches: ['*']
 
 jobs:
   check-source-branch:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'master'
     steps:
     - name: Block non-develop merges
       if: github.event.pull_request.head.ref != 'develop'
