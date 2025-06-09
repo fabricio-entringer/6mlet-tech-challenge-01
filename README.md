@@ -15,7 +15,7 @@ Tech Challenge #1 - FIAP Machine Learning Engineering Postgraduate specializatio
 This project is a FastAPI application created for the 6MLET Tech Challenge - Delivery 01. It includes a simple REST API, comprehensive testing with pytest, and version control using commitizen.
 
 This delivery is from **Group #3**, with the following team members:
-- **Fabricio Entringer** 
+- **Fabricio Entringer** - [GitHub Profile](https://github.com/fabricio-entringer) 
 - **Adriano Ribeiro** - [GitHub Profile](https://github.com/adrianoribeiro)
 
 ## Features
