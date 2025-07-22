@@ -73,6 +73,15 @@ instance/
 # Scrapy stuff:
 .scrapy
 
+# Web scraper output and logs
+logs/*.log
+logs/*.txt
+data/*.csv
+data/*.json
+data/*.xlsx
+data/*
+!data/.gitkeep
+
 # Sphinx documentation
 docs/_build/
 

@@ -8,6 +8,7 @@ description = "FastAPI application for 6MLET Tech Challenge 01"
 version = "0.0.1"
 authors = [
     {name = "Fabricio Entringer", email = "fabricio@entringer.dev"},
+    {name = "Adriano Ribeiro", email = "aribeiro@gmail.com"}
 ]
 readme = "README.md"
 license = "MIT"
