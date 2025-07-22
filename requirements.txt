@@ -4,3 +4,9 @@ pytest==8.4.0
 pytest-asyncio==1.0.0
 httpx==0.28.1
 commitizen==4.8.2
+
+# Web scraping dependencies
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.2.2
+pandas==2.2.2

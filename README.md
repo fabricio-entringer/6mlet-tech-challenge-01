@@ -24,24 +24,77 @@ This delivery is from **Group #3**, with the following team members:
 - **Uvicorn** ASGI server for running the application
 - **pytest** for testing with async support
 - **Commitizen** for conventional commits and version management
+- **Web Scraping System** for automated book data collection from books.toscrape.com
+  - CLI and programmatic interfaces
+  - Comprehensive data extraction with pagination support
+  - Robust error handling and retry mechanisms
+  - Rate limiting and respectful crawling
+  - CSV export functionality
+  - Detailed logging and statistics
 
 ## Project Structure
 
-```
+## Project Structure
+
+```text
 ├── app/
 │   ├── __init__.py
 │   └── main.py          # FastAPI application
+├── scripts/             # Web scraping and utility scripts
+│   ├── __init__.py
+│   ├── books_scraper.py # Main scraper implementation
+│   ├── scraper_api.py   # API interface for CLI and programmatic use
+│   ├── run_scraper.py   # CLI interface for scraper
+│   ├── config.py        # Scraper configuration
+│   └── README.md        # Scraper documentation
 ├── tests/
 │   ├── __init__.py
-│   └── test_main.py     # Test cases
+│   ├── test_main.py     # API test cases
+│   ├── test_books_scraper.py # Scraper test cases
+│   └── test_scraper_api.py   # Scraper API test cases
+├── data/                # Output directory for scraped data (gitignored)
+├── logs/                # Log files directory (gitignored)
 ├── assets/              # Project assets
 ├── requirements.txt     # Python dependencies
 ├── pyproject.toml       # Project configuration
-├── pytest.ini          # Pytest configuration
-├── run.py              # Application startup script
-├── Makefile            # Common tasks
-└── README.md           # This file
+├── demo_api_usage.py    # API usage demonstration script
 ```
+
+## Web Scraping System
+
+The project includes a comprehensive web scraping system for extracting book data from [books.toscrape.com](https://books.toscrape.com/). The system provides both command-line and programmatic interfaces.
+
+### Quick Start
+
+```bash
+# Scrape all books (recommended API interface)
+python scripts/scraper_api.py
+
+# Get available categories
+python scripts/scraper_api.py --mode categories
+
+# Scrape a specific category
+python scripts/scraper_api.py --mode category --category "Fiction"
+
+# Scrape a sample of books
+python scripts/scraper_api.py --mode sample --max-books 50
+
+# Demonstrate programmatic usage
+python demo_api_usage.py
+```
+
+### Key Scraper Features
+
+- **Complete Data Extraction**: Scrapes all books with pagination support
+- **Multiple Interfaces**: CLI and programmatic API access
+- **Comprehensive Data**: Title, price, rating, availability, category, image URL
+- **Robust Error Handling**: Retry mechanisms and graceful error recovery
+- **Rate Limiting**: Respectful crawling with configurable delays
+- **Data Export**: CSV format with organized output
+- **Detailed Logging**: Comprehensive logging and statistics
+- **Flexible Usage**: Sample scraping, category-specific scraping, full scraping
+
+For detailed documentation, see [`scripts/README.md`](scripts/README.md).
 
 ## Installation
 
@@ -143,6 +196,37 @@ Or using make:
 ```bash
 make test
 ```
+
+### Web Scraping System
+
+This project includes a comprehensive web scraping system for collecting book data from [books.toscrape.com](https://books.toscrape.com/).
+
+#### Scraper Features
+
+- ✅ **Complete Data Extraction**: Scrapes all books from all categories with pagination support
+- ✅ **Robust Error Handling**: Implements retry mechanisms and graceful error recovery
+- ✅ **Rate Limiting**: Respects website resources with configurable delays
+- ✅ **CSV Export**: Stores data in well-structured CSV format
+- ✅ **CLI Interface**: Easy-to-use command-line interface
+
+#### Quick Start
+
+Run the scraper with default settings:
+
+```bash
+python scripts/run_scraper.py
+```
+
+For detailed usage and configuration options, see the [Scraper Documentation](scripts/README.md).
+
+#### Data Output
+
+The scraper extracts comprehensive book information:
+
+- **Title**, **Price**, **Rating** (text and numeric)
+- **Availability**, **Category**, **Image URL**
+- Exports to `data/books_data.csv` by default
+- Provides detailed statistics and logging
 
 ## CI/CD Workflows
 
@@ -317,3 +401,10 @@ When creating an issue, please:
 - pytest-asyncio 1.0.0+
 - httpx 0.28.1+
 - commitizen 4.8.2+
+
+### Web Scraping Dependencies
+
+- requests 2.32.3+
+- beautifulsoup4 4.12.3+
+- lxml 5.2.2+
+- pandas 2.2.2+
