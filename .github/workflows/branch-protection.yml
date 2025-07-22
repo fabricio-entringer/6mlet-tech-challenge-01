@@ -10,17 +10,33 @@ on:
 jobs:
   check-source-branch:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.base.ref == 'master'
     steps:
-    - name: Block non-develop merges
-      if: github.event.pull_request.head.ref != 'develop'
+    - name: Check if targeting master branch
+      id: check-target
+      run: |
+        if [[ "${{ github.event.pull_request.base.ref }}" == "master" ]]; then
+          echo "targeting_master=true" >> $GITHUB_OUTPUT
+        else
+          echo "targeting_master=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Block non-develop merges to master
+      if: steps.check-target.outputs.targeting_master == 'true' && github.event.pull_request.head.ref != 'develop'
       run: |
         echo "❌ ERROR: Only 'develop' branch can merge into 'master'"
         echo "Source: ${{ github.event.pull_request.head.ref }}"
+        echo "Target: ${{ github.event.pull_request.base.ref }}"
         echo "Required workflow: ${{ github.event.pull_request.head.ref }} → develop → master"
         exit 1
     
-    - name: Allow develop merge
-      if: github.event.pull_request.head.ref == 'develop'
+    - name: Allow develop merge to master
+      if: steps.check-target.outputs.targeting_master == 'true' && github.event.pull_request.head.ref == 'develop'
       run: |
         echo "✅ develop → master merge authorized"
+    
+    - name: Allow merges to non-master branches
+      if: steps.check-target.outputs.targeting_master == 'false'
+      run: |
+        echo "✅ Merge to '${{ github.event.pull_request.base.ref }}' branch authorized"
+        echo "Source: ${{ github.event.pull_request.head.ref }}"
+        echo "Target: ${{ github.event.pull_request.base.ref }}"
