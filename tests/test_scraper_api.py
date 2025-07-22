@@ -28,7 +28,7 @@ class TestBooksScraperAPI(unittest.TestCase):
             max_retries=2,
             timeout=5,
             output_dir="test_data",
-            logs_dir="test_logs"
+            logs_dir="test_logs",
         )
 
     def test_initialization(self) -> None:
@@ -44,7 +44,7 @@ class TestBooksScraperAPI(unittest.TestCase):
     def test_initialization_with_defaults(self) -> None:
         """Test API initialization with default parameters."""
         api = BooksScraperAPI()
-        
+
         # Should use values from config
         self.assertEqual(api.delay, 1.0)
         self.assertEqual(api.max_retries, 3)
@@ -52,7 +52,7 @@ class TestBooksScraperAPI(unittest.TestCase):
         self.assertEqual(api.output_dir, "data")
         self.assertEqual(api.logs_dir, "logs")
 
-    @patch('scripts.scraper_api.BooksScraper')
+    @patch("scripts.scraper_api.BooksScraper")
     def test_initialize_scraper(self, mock_scraper_class) -> None:
         """Test scraper initialization."""
         mock_scraper = Mock()
@@ -62,11 +62,7 @@ class TestBooksScraperAPI(unittest.TestCase):
         scraper = self.api._initialize_scraper()
 
         # Should create scraper with correct parameters
-        mock_scraper_class.assert_called_with(
-            delay=0.1,
-            max_retries=2,
-            timeout=5
-        )
+        mock_scraper_class.assert_called_with(delay=0.1, max_retries=2, timeout=5)
 
         # Should return the mock scraper
         self.assertEqual(scraper, mock_scraper)
@@ -78,7 +74,7 @@ class TestBooksScraperAPI(unittest.TestCase):
         # Should have called the constructor twice (always creates fresh instance)
         self.assertEqual(mock_scraper_class.call_count, 2)
 
-    @patch('scripts.scraper_api.BooksScraper')
+    @patch("scripts.scraper_api.BooksScraper")
     def test_scrape_all_books_success(self, mock_scraper_class) -> None:
         """Test successful scraping of all books."""
         mock_scraper = Mock()
@@ -87,7 +83,7 @@ class TestBooksScraperAPI(unittest.TestCase):
         # Mock successful scraping
         mock_books = [
             {"title": "Book 1", "price": "£10.00", "category": "Fiction"},
-            {"title": "Book 2", "price": "£15.00", "category": "Science"}
+            {"title": "Book 2", "price": "£15.00", "category": "Science"},
         ]
         mock_stats = {"total_books": 2, "total_categories": 2}
 
@@ -113,7 +109,7 @@ class TestBooksScraperAPI(unittest.TestCase):
         # Should store last result
         self.assertEqual(self.api.last_result, result)
 
-    @patch('scripts.scraper_api.BooksScraper')
+    @patch("scripts.scraper_api.BooksScraper")
     def test_scrape_all_books_no_save(self, mock_scraper_class) -> None:
         """Test scraping without saving to CSV."""
         mock_scraper = Mock()
@@ -134,7 +130,7 @@ class TestBooksScraperAPI(unittest.TestCase):
         # Should not have csv_file in result
         self.assertNotIn("csv_file", result)
 
-    @patch('scripts.scraper_api.BooksScraper')
+    @patch("scripts.scraper_api.BooksScraper")
     def test_scrape_all_books_custom_filename(self, mock_scraper_class) -> None:
         """Test scraping with custom CSV filename."""
         mock_scraper = Mock()
@@ -161,7 +157,7 @@ class TestBooksScraperAPI(unittest.TestCase):
         # Set a result and test
         test_result = {"books": [], "total_books": 0}
         self.api.last_result = test_result
-        
+
         self.assertEqual(self.api.get_last_result(), test_result)
 
 
