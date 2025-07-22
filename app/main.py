@@ -3,15 +3,15 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import BackgroundTasks, FastAPI, HTTPException
 from pydantic import BaseModel
 
 # Add the project root to Python path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from scripts.scraper_api import BooksScraperAPI
 from scripts.history_logger import ScrapingHistoryLogger
+from scripts.scraper_api import BooksScraperAPI
 
 from .utils import get_version
 

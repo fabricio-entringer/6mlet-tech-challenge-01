@@ -6,17 +6,17 @@ and related functionality.
 """
 
 import csv
+
+# Add the project root to Python path
+import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, mock_open, patch
 
 import pytest
 import requests
 from bs4 import BeautifulSoup
-
-# Add the project root to Python path
-import sys
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
