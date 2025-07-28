@@ -3,9 +3,9 @@
 from fastapi import BackgroundTasks, FastAPI
 
 from ..models import (
-    ScrapingRequest,
-    ScrapingResponse, 
     HistoryResponse,
+    ScrapingRequest,
+    ScrapingResponse,
     StatusResponse,
 )
 from ..utils import get_version

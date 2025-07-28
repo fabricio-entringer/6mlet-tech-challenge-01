@@ -1,6 +1,7 @@
 """History response model."""
 
 from typing import List, Optional
+
 from pydantic import BaseModel
 
 from .execution_history_item import ExecutionHistoryItem

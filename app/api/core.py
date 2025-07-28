@@ -1,6 +1,7 @@
 """Core API endpoints."""
 
 from typing import Dict
+
 from ..utils import get_version
 
 app_version = get_version()

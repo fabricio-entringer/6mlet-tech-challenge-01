@@ -16,11 +16,11 @@ from scripts.history_logger import ScrapingHistoryLogger
 from scripts.scraper_api import BooksScraperAPI
 
 from ..models import (
+    ExecutionHistoryItem,
+    HistoryResponse,
     ScrapingRequest,
     ScrapingResponse,
-    HistoryResponse,
     StatusResponse,
-    ExecutionHistoryItem,
 )
 
 # Global variable to track current scraping status
