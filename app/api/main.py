@@ -1,15 +1,16 @@
 """Main FastAPI application."""
 
-from fastapi import BackgroundTasks, FastAPI
+from fastapi import BackgroundTasks, FastAPI, Query
 
 from ..models import (
+    CategoriesResponse,
     HistoryResponse,
     ScrapingRequest,
     ScrapingResponse,
     StatusResponse,
 )
 from ..utils import get_version
-from . import core, scraping
+from . import categories, core, scraping
 
 app_version = get_version()
 
@@ -58,6 +59,17 @@ async def get_scraping_history(include_all: bool = False) -> HistoryResponse:
 async def get_scraping_status() -> StatusResponse:
     """Get the current status of scraping operations."""
     return await scraping.get_scraping_status()
+
+
+# Categories endpoints
+@app.get("/api/v1/categories", response_model=CategoriesResponse)
+async def get_categories(
+    sort: str = Query("name", description="Sort by 'name' or 'count'"),
+    order: str = Query("asc", description="Sort order: 'asc' or 'desc'"),
+    include_stats: bool = Query(True, description="Include statistics (price, rating)"),
+) -> CategoriesResponse:
+    """Get all book categories with optional statistics."""
+    return await categories.get_categories(sort, order, include_stats)
 
 
 if __name__ == "__main__":
