@@ -7,11 +7,11 @@ from app.api.categories import BookDataService, get_categories
 
 class TestBookDataService:
     """Test the BookDataService class."""
-    
+
     def test_create_slug(self):
         """Test slug creation."""
         service = BookDataService()
-        
+
         assert service._create_slug("Fiction") == "fiction"
         assert service._create_slug("Science Fiction") == "science-fiction"
         assert service._create_slug("Food & Drink") == "food-and-drink"
@@ -28,17 +28,19 @@ Book 2,£35.50,Three,3,In stock,Fiction,http://example.com/2.jpg
 Book 3,£15.99,Five,5,In stock,Science Fiction,http://example.com/3.jpg
 Book 4,£45.00,Two,2,In stock,Default,http://example.com/4.jpg
 Book 5,£20.00,Four,4,In stock,Romance,http://example.com/5.jpg"""
-    
+
     with patch("builtins.open", mock_open(read_data=csv_data)):
         result = await get_categories()
-        
-        assert result.total_categories == 4  # Fiction, Science Fiction, Romance, Default
+
+        assert (
+            result.total_categories == 4
+        )  # Fiction, Science Fiction, Romance, Default
         assert len(result.categories) == 4
-        
+
         # Check categories are sorted by name by default
         category_names = [cat.name for cat in result.categories]
         assert category_names == sorted(category_names)
-        
+
         # Check Fiction category details
         fiction_cat = next(cat for cat in result.categories if cat.name == "Fiction")
         assert fiction_cat.book_count == 2
@@ -57,10 +59,10 @@ Book 1,£25.99,Four,4,In stock,Fiction,http://example.com/1.jpg
 Book 2,£35.50,Three,3,In stock,Fiction,http://example.com/2.jpg
 Book 3,£15.99,Five,5,In stock,Fiction,http://example.com/3.jpg
 Book 4,£20.00,Four,4,In stock,Romance,http://example.com/4.jpg"""
-    
+
     with patch("builtins.open", mock_open(read_data=csv_data)):
         result = await get_categories(sort="count", order="desc")
-        
+
         assert result.total_categories == 2
         # Fiction should be first (3 books), then Romance (1 book)
         assert result.categories[0].name == "Fiction"
@@ -74,10 +76,10 @@ async def test_get_categories_without_stats():
     """Test getting categories without statistics."""
     csv_data = """title,price,rating_text,rating_numeric,availability,category,image_url
 Book 1,£25.99,Four,4,In stock,Fiction,http://example.com/1.jpg"""
-    
+
     with patch("builtins.open", mock_open(read_data=csv_data)):
         result = await get_categories(include_stats=False)
-        
+
         assert result.total_categories == 1
         fiction_cat = result.categories[0]
         assert fiction_cat.name == "Fiction"

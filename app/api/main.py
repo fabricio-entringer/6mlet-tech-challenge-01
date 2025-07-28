@@ -66,7 +66,7 @@ async def get_scraping_status() -> StatusResponse:
 async def get_categories(
     sort: str = Query("name", description="Sort by 'name' or 'count'"),
     order: str = Query("asc", description="Sort order: 'asc' or 'desc'"),
-    include_stats: bool = Query(True, description="Include statistics (price, rating)")
+    include_stats: bool = Query(True, description="Include statistics (price, rating)"),
 ) -> CategoriesResponse:
     """Get all book categories with optional statistics."""
     return await categories.get_categories(sort, order, include_stats)

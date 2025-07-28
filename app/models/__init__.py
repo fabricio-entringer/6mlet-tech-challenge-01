@@ -9,7 +9,7 @@ from .status_response import StatusResponse
 
 __all__ = [
     "Category",
-    "CategoriesResponse", 
+    "CategoriesResponse",
     "PriceRange",
     "ScrapingRequest",
     "ScrapingResponse",
