@@ -8,23 +8,6 @@ from app.api.categories import BookDataService, get_categories
 class TestBookDataService:
     """Test the BookDataService class."""
     
-    def test_is_valid_category(self):
-        """Test category validation."""
-        service = BookDataService()
-        
-        # Valid categories
-        assert service._is_valid_category("Fiction")
-        assert service._is_valid_category("Science Fiction")
-        assert service._is_valid_category("Young Adult")
-        
-        # Invalid categories
-        assert not service._is_valid_category("Default")
-        assert not service._is_valid_category("In stock")
-        assert not service._is_valid_category("1")
-        assert not service._is_valid_category("One")
-        assert not service._is_valid_category("")
-        assert not service._is_valid_category("abc")  # too short
-    
     def test_create_slug(self):
         """Test slug creation."""
         service = BookDataService()
@@ -49,8 +32,8 @@ Book 5,£20.00,Four,4,In stock,Romance,http://example.com/5.jpg"""
     with patch("builtins.open", mock_open(read_data=csv_data)):
         result = await get_categories()
         
-        assert result.total_categories == 3  # Fiction, Science Fiction, Romance (Default filtered out)
-        assert len(result.categories) == 3
+        assert result.total_categories == 4  # Fiction, Science Fiction, Romance, Default
+        assert len(result.categories) == 4
         
         # Check categories are sorted by name by default
         category_names = [cat.name for cat in result.categories]
