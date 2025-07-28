@@ -4,7 +4,7 @@ import csv
 import os
 from typing import Dict, List, Optional, Tuple
 
-from ..models.category import Category, CategoriesResponse, PriceRange
+from ..models.category import CategoriesResponse, Category, PriceRange
 from ..utils import convert_price_to_float, convert_rating_to_float
 
 

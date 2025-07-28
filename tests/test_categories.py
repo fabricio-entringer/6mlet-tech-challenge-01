@@ -1,7 +1,9 @@
 """Tests for the categories endpoint."""
 
+from unittest.mock import mock_open, patch
+
 import pytest
-from unittest.mock import patch, mock_open
+
 from app.api.categories import BookDataService, get_categories
 
 

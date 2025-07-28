@@ -1,6 +1,6 @@
 """Models package for the application."""
 
-from .category import Category, CategoriesResponse, PriceRange
+from .category import CategoriesResponse, Category, PriceRange
 from .execution_history_item import ExecutionHistoryItem
 from .history_response import HistoryResponse
 from .scraping_request import ScrapingRequest
