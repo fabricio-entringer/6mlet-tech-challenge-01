@@ -13,6 +13,7 @@ from ..models import (
     ScrapingResponse,
     StatusResponse,
     TopRatedBooksResponse,
+    PriceRangeBooksResponse,
 )
 from ..utils import get_version
 from . import books, categories, core, scraping
@@ -108,6 +109,25 @@ async def get_top_rated_books(
 ) -> TopRatedBooksResponse:
     """Get the top-rated books."""
     return await books.get_top_rated_books(limit)
+
+
+@app.get("/api/v1/books/price-range", response_model=PriceRangeBooksResponse)
+async def get_books_by_price_range(
+    min_price: float = Query(..., ge=0, description="Minimum price (inclusive)"),
+    max_price: float = Query(..., ge=0, description="Maximum price (inclusive)"),
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    limit: int = Query(20, ge=1, le=100, description="Number of items per page"),
+    sort: str = Query(
+        "price",
+        pattern="^(title|price|rating|availability|category)$",
+        description="Sort field",
+    ),
+    order: str = Query("asc", pattern="^(asc|desc)$", description="Sort order"),
+) -> PriceRangeBooksResponse:
+    """Get books within a specific price range with statistics."""
+    return await books.get_books_by_price_range(
+        min_price, max_price, page, limit, sort, order
+    )
 
 
 @app.get("/api/v1/books/{book_id}")

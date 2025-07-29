@@ -59,3 +59,33 @@ class BookResponse(BaseModel):
     """Response model for single book endpoint."""
 
     data: Book = Field(..., description="Book details")
+
+
+class PriceRangeInfo(BaseModel):
+    """Price range information."""
+    
+    min: float = Field(..., description="Minimum price")
+    max: float = Field(..., description="Maximum price")
+
+
+class PriceDistribution(BaseModel):
+    """Price distribution statistics."""
+    
+    ranges: dict = Field(..., description="Price distribution by ranges")
+
+
+class PriceRangeMetadata(BaseModel):
+    """Metadata for the price-range response."""
+    
+    count: int = Field(..., ge=0, description="Number of books in the price range")
+    avg_price: float = Field(..., ge=0, description="Average price of books in range")
+    price_distribution: dict = Field(..., description="Price distribution statistics")
+
+
+class PriceRangeBooksResponse(BaseModel):
+    """Response model for the price-range books endpoint."""
+    
+    price_range: PriceRangeInfo = Field(..., description="Applied price range")
+    data: List[Book] = Field(..., description="List of books within price range")
+    metadata: PriceRangeMetadata = Field(..., description="Price range metadata")
+    pagination: PaginationInfo = Field(..., description="Pagination information")
