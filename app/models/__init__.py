@@ -1,6 +1,6 @@
 """Models package for the application."""
 
-from .book import Book, BookResponse, BooksResponse, PaginationInfo
+from .book import Book, BookResponse, BooksResponse, PaginationInfo, TopRatedBooksResponse, TopRatedMetadata
 from .category import CategoriesResponse, Category, PriceRange
 from .execution_history_item import ExecutionHistoryItem
 from .history_response import HistoryResponse
@@ -13,6 +13,8 @@ __all__ = [
     "BookResponse",
     "BooksResponse",
     "PaginationInfo",
+    "TopRatedBooksResponse",
+    "TopRatedMetadata",
     "Category",
     "CategoriesResponse",
     "PriceRange",

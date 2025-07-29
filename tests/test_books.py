@@ -490,3 +490,215 @@ def test_get_book_by_id_nonexistent_data_file():
         assert response.status_code == 404
         data = response.json()
         assert "Book with ID 1 not found" in data["detail"]
+
+
+def test_get_top_rated_books_success(mock_books_csv):
+    """Test getting top-rated books successfully."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/top-rated")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Check response structure
+        assert "data" in data
+        assert "metadata" in data
+        assert isinstance(data["data"], list)
+        
+        # Check metadata structure
+        metadata = data["metadata"]
+        expected_metadata_fields = {"limit", "returned", "highest_rating", "lowest_rating"}
+        assert set(metadata.keys()) == expected_metadata_fields
+        
+        # Should return books sorted by rating descending
+        ratings = [book["rating_numeric"] for book in data["data"]]
+        assert ratings == sorted(ratings, reverse=True)
+        
+        # Default limit should be 10
+        assert metadata["limit"] == 10
+        # Should return 4 books (all from sample data have ratings)
+        assert metadata["returned"] == 4
+        assert metadata["highest_rating"] == 5
+        assert metadata["lowest_rating"] == 2
+
+
+def test_get_top_rated_books_with_limit(mock_books_csv):
+    """Test getting top-rated books with custom limit."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/top-rated?limit=2")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        assert len(data["data"]) == 2
+        assert data["metadata"]["limit"] == 2
+        assert data["metadata"]["returned"] == 2
+        
+        # Should get the top 2 rated books
+        ratings = [book["rating_numeric"] for book in data["data"]]
+        assert ratings[0] >= ratings[1]  # First should be >= second
+
+
+def test_get_top_rated_books_sorting_with_ties(mock_books_csv):
+    """Test that books with same rating are sorted by title."""
+    # Create sample data with books having same ratings
+    books_with_ties = [
+        {
+            "id": 1,
+            "title": "Zebra Book",
+            "price": "£15.99",
+            "rating_text": "Four",
+            "rating_numeric": "4",
+            "availability": "In stock",
+            "category": "Fiction",
+            "image_url": "https://example.com/zebra.jpg",
+        },
+        {
+            "id": 2,
+            "title": "Alpha Book",
+            "price": "£12.99",
+            "rating_text": "Four",
+            "rating_numeric": "4",
+            "availability": "In stock",
+            "category": "Fiction",
+            "image_url": "https://example.com/alpha.jpg",
+        },
+    ]
+    
+    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
+        fieldnames = ['id', 'title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(books_with_ties)
+        temp_file_path = f.name
+    
+    try:
+        with patch('app.api.books.books_data_service.data_file', temp_file_path):
+            response = client.get("/api/v1/books/top-rated")
+            
+            assert response.status_code == 200
+            data = response.json()
+            
+            # Books with same rating should be sorted alphabetically by title
+            assert data["data"][0]["title"] == "Alpha Book"
+            assert data["data"][1]["title"] == "Zebra Book"
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_get_top_rated_books_excludes_no_rating():
+    """Test that books without ratings are excluded."""
+    books_with_no_rating = [
+        {
+            "id": 1,
+            "title": "Rated Book",
+            "price": "£15.99",
+            "rating_text": "Four",
+            "rating_numeric": "4",
+            "availability": "In stock",
+            "category": "Fiction",
+            "image_url": "https://example.com/rated.jpg",
+        },
+        {
+            "id": 2,
+            "title": "Unrated Book",
+            "price": "£12.99",
+            "rating_text": "Unknown",
+            "rating_numeric": "0",
+            "availability": "In stock",
+            "category": "Fiction",
+            "image_url": "https://example.com/unrated.jpg",
+        },
+    ]
+    
+    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
+        fieldnames = ['id', 'title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(books_with_no_rating)
+        temp_file_path = f.name
+    
+    try:
+        with patch('app.api.books.books_data_service.data_file', temp_file_path):
+            response = client.get("/api/v1/books/top-rated")
+            
+            assert response.status_code == 200
+            data = response.json()
+            
+            # Should only return the book with rating
+            assert len(data["data"]) == 1
+            assert data["data"][0]["title"] == "Rated Book"
+            assert data["metadata"]["returned"] == 1
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_get_top_rated_books_validation_errors():
+    """Test top-rated books endpoint parameter validation."""
+    # Test limit too low
+    response = client.get("/api/v1/books/top-rated?limit=0")
+    assert response.status_code == 422
+    
+    # Test limit too high
+    response = client.get("/api/v1/books/top-rated?limit=101")
+    assert response.status_code == 422
+    
+    # Test invalid limit type
+    response = client.get("/api/v1/books/top-rated?limit=invalid")
+    assert response.status_code == 422
+
+
+def test_get_top_rated_books_empty_data():
+    """Test top-rated books endpoint with empty data."""
+    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
+        fieldnames = ['id', 'title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        temp_file_path = f.name
+    
+    try:
+        with patch('app.api.books.books_data_service.data_file', temp_file_path):
+            response = client.get("/api/v1/books/top-rated")
+            
+            assert response.status_code == 200
+            data = response.json()
+            
+            assert data["data"] == []
+            assert data["metadata"]["returned"] == 0
+            assert data["metadata"]["highest_rating"] == 0
+            assert data["metadata"]["lowest_rating"] == 0
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_get_top_rated_books_response_structure(mock_books_csv):
+    """Test the structure of top-rated books response."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/top-rated")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Check top-level structure
+        assert set(data.keys()) == {"data", "metadata"}
+        
+        # Check book structure (same as regular books endpoint)
+        if data["data"]:
+            book = data["data"][0]
+            expected_fields = {
+                "id", "title", "price", "price_display", "rating_text", 
+                "rating_numeric", "availability", "category", "image_url",
+                "description", "upc", "reviews"
+            }
+            assert set(book.keys()) == expected_fields
+        
+        # Check metadata structure
+        metadata = data["metadata"]
+        expected_metadata_fields = {"limit", "returned", "highest_rating", "lowest_rating"}
+        assert set(metadata.keys()) == expected_metadata_fields
+        
+        # Check data types for metadata
+        assert isinstance(metadata["limit"], int)
+        assert isinstance(metadata["returned"], int)
+        assert isinstance(metadata["highest_rating"], int)
+        assert isinstance(metadata["lowest_rating"], int)

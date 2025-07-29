@@ -39,6 +39,22 @@ class BooksResponse(BaseModel):
     filters_applied: Optional[dict] = Field(None, description="Applied filters summary")
 
 
+class TopRatedMetadata(BaseModel):
+    """Metadata for the top-rated books response."""
+
+    limit: int = Field(..., ge=1, le=100, description="Number of books requested")
+    returned: int = Field(..., ge=0, description="Number of books returned")
+    highest_rating: int = Field(..., ge=0, le=5, description="Highest rating in results")
+    lowest_rating: int = Field(..., ge=0, le=5, description="Lowest rating in results")
+
+
+class TopRatedBooksResponse(BaseModel):
+    """Response model for the top-rated books endpoint."""
+
+    data: List[Book] = Field(..., description="List of top-rated books")
+    metadata: TopRatedMetadata = Field(..., description="Response metadata")
+
+
 class BookResponse(BaseModel):
     """Response model for single book endpoint."""
 
