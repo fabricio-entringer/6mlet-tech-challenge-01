@@ -12,6 +12,7 @@ from ..models import (
     ScrapingRequest,
     ScrapingResponse,
     StatusResponse,
+    TopRatedBooksResponse,
 )
 from ..utils import get_version
 from . import books, categories, core, scraping
@@ -99,6 +100,14 @@ async def get_books(
     return await books.get_books(
         page, limit, category, sort, order, min_price, max_price, min_rating, availability
     )
+
+
+@app.get("/api/v1/books/top-rated", response_model=TopRatedBooksResponse)
+async def get_top_rated_books(
+    limit: int = Query(10, ge=1, le=100, description="Number of books to return (1-100)")
+) -> TopRatedBooksResponse:
+    """Get the top-rated books."""
+    return await books.get_top_rated_books(limit)
 
 
 @app.get("/api/v1/books/{book_id}")

@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Union
 
 from fastapi import HTTPException, Query
 
-from ..models import Book, BooksResponse, PaginationInfo
+from ..models import Book, BooksResponse, PaginationInfo, TopRatedBooksResponse, TopRatedMetadata
 from ..utils import convert_price_to_float
 
 
@@ -261,6 +261,55 @@ class BooksDataService:
 
         return None
 
+    def get_top_rated_books(self, limit: int = 10) -> TopRatedBooksResponse:
+        """
+        Get top-rated books with highest ratings.
+
+        Args:
+            limit: Number of books to return (1-100, default: 10)
+
+        Returns:
+            TopRatedBooksResponse with top-rated books and metadata
+        """
+        # Load books from CSV
+        raw_books = self._load_books_from_csv()
+
+        # Convert to Book models, filtering out invalid rows
+        all_books = []
+        for index, book_row in enumerate(raw_books, start=1):
+            book = self._convert_book_data(book_row, index)
+            if book:
+                all_books.append(book)
+
+        # Filter books with ratings (exclude books with rating 0)
+        books_with_ratings = [book for book in all_books if book.rating_numeric > 0]
+
+        # Sort by rating (descending) and then by title (ascending) for ties
+        sorted_books = sorted(
+            books_with_ratings,
+            key=lambda x: (-x.rating_numeric, x.title.lower())
+        )
+
+        # Apply limit
+        top_books = sorted_books[:limit]
+
+        # Calculate metadata
+        if top_books:
+            highest_rating = top_books[0].rating_numeric
+            lowest_rating = top_books[-1].rating_numeric
+        else:
+            highest_rating = 0
+            lowest_rating = 0
+
+        metadata = TopRatedMetadata(
+            limit=limit,
+            returned=len(top_books),
+            highest_rating=highest_rating,
+            lowest_rating=lowest_rating,
+        )
+
+        return TopRatedBooksResponse(data=top_books, metadata=metadata)
+
 
 # Initialize the data service
 books_data_service = BooksDataService()
@@ -393,6 +442,46 @@ async def get_book_by_id(book_id: int) -> Book:
             )
 
         return book
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Internal server error: {str(e)}"
+        )
+
+
+async def get_top_rated_books(
+    limit: int = Query(10, ge=1, le=100, description="Number of books to return (1-100)")
+) -> TopRatedBooksResponse:
+    """
+    Get the top-rated books.
+
+    This endpoint returns books with the highest ratings, sorted by rating in descending order.
+    Books with the same rating are sorted by title in ascending order (alphabetical).
+    Only books with ratings (rating_numeric > 0) are included.
+
+    **Query Parameters:**
+    - **limit**: Number of books to return (1-100, default: 10)
+
+    **Response includes:**
+    - **data**: Array of top-rated book objects
+    - **metadata**: Response metadata including:
+      - **limit**: Number of books requested
+      - **returned**: Number of books actually returned
+      - **highest_rating**: Highest rating in the results
+      - **lowest_rating**: Lowest rating in the results
+
+    **Sorting Logic:**
+    1. Primary sort: Rating in descending order (5 to 1)
+    2. Secondary sort: Title in ascending order (alphabetical) for ties
+
+    **Error Responses:**
+    - **400**: Invalid limit parameter
+    - **500**: Internal server error
+    """
+    try:
+        return books_data_service.get_top_rated_books(limit=limit)
 
     except HTTPException:
         raise
