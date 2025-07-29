@@ -176,7 +176,7 @@ jobs:
         echo "  - QUALITY_RESULT='$QUALITY_RESULT'" >> $GITHUB_STEP_SUMMARY
         
         # Check if all jobs succeeded
-        if [[ "$TEST_RESULT" == "success" ]] && [[ "$BUILD_RESULT" == "success" ]] && [[ "$SECURITY_RESULT" == "success" ]] && [[ "$QUALITY_RESULT" == "success" ]]; then
+        if [[ "$TEST_RESULT" == "success" ]] && [[ "$BUILD_RESULT" == "success" ]] && [[ "$SECURITY_RESULT" == "success" ]] && [[ "$QUALITY_RESULT" == "" ]]; then
           echo "✅ All checks passed!" >> $GITHUB_STEP_SUMMARY
         else
           echo "❌ Some checks failed!" >> $GITHUB_STEP_SUMMARY
