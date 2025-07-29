@@ -702,3 +702,395 @@ def test_get_top_rated_books_response_structure(mock_books_csv):
         assert isinstance(metadata["returned"], int)
         assert isinstance(metadata["highest_rating"], int)
         assert isinstance(metadata["lowest_rating"], int)
+
+
+def test_get_books_by_price_range_success(mock_books_csv):
+    """Test getting books by price range successfully."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/price-range?min_price=15&max_price=30")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Check response structure
+        assert "price_range" in data
+        assert "data" in data
+        assert "metadata" in data
+        assert "pagination" in data
+        
+        # Check price_range structure
+        price_range = data["price_range"]
+        assert price_range["min"] == 15.0
+        assert price_range["max"] == 30.0
+        
+        # Check that all returned books are within the price range
+        for book in data["data"]:
+            assert 15.0 <= book["price"] <= 30.0
+        
+        # Should return 2 books (£19.99 and £25.50)
+        assert len(data["data"]) == 2
+        
+        # Check metadata structure
+        metadata = data["metadata"]
+        assert "count" in metadata
+        assert "avg_price" in metadata
+        assert "price_distribution" in metadata
+        assert metadata["count"] == 2
+
+
+def test_get_books_by_price_range_metadata(mock_books_csv):
+    """Test price range metadata calculations."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=40")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        metadata = data["metadata"]
+        
+        # Should return 3 books (£12.00, £19.99, £25.50, £35.99)
+        assert metadata["count"] == 4
+        
+        # Check average price calculation
+        expected_avg = (12.00 + 19.99 + 25.50 + 35.99) / 4
+        assert abs(metadata["avg_price"] - expected_avg) < 0.01
+        
+        # Check price distribution exists
+        assert isinstance(metadata["price_distribution"], dict)
+        assert len(metadata["price_distribution"]) == 4  # 4 ranges
+
+
+def test_get_books_by_price_range_pagination(mock_books_csv):
+    """Test price range endpoint with pagination."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        # Get first page with limit of 1
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=40&page=1&limit=1")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        assert len(data["data"]) == 1
+        pagination = data["pagination"]
+        assert pagination["page"] == 1
+        assert pagination["limit"] == 1
+        assert pagination["total"] == 4
+        assert pagination["pages"] == 4
+        
+        # Get second page
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=40&page=2&limit=1")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        assert len(data["data"]) == 1
+        assert data["pagination"]["page"] == 2
+
+
+def test_get_books_by_price_range_sorting(mock_books_csv):
+    """Test price range endpoint sorting."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        # Sort by price ascending (default)
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=40&sort=price&order=asc")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        prices = [book["price"] for book in data["data"]]
+        assert prices == sorted(prices)
+        
+        # Sort by price descending
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=40&sort=price&order=desc")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        prices = [book["price"] for book in data["data"]]
+        assert prices == sorted(prices, reverse=True)
+        
+        # Sort by title
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=40&sort=title&order=asc")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        titles = [book["title"] for book in data["data"]]
+        assert titles == sorted(titles)
+
+
+def test_get_books_by_price_range_exact_boundaries(mock_books_csv):
+    """Test price range with exact boundary values."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        # Test with exact book price as boundary
+        response = client.get("/api/v1/books/price-range?min_price=19.99&max_price=19.99")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Should return exactly one book
+        assert len(data["data"]) == 1
+        assert data["data"][0]["price"] == 19.99
+        assert data["metadata"]["count"] == 1
+
+
+def test_get_books_by_price_range_no_results(mock_books_csv):
+    """Test price range with no matching books."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        # Price range with no books
+        response = client.get("/api/v1/books/price-range?min_price=100&max_price=200")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        assert len(data["data"]) == 0
+        assert data["metadata"]["count"] == 0
+        assert data["metadata"]["avg_price"] == 0.0
+        assert data["pagination"]["total"] == 0
+        assert data["pagination"]["pages"] == 0
+
+
+def test_get_books_by_price_range_validation():
+    """Test price range endpoint parameter validation."""
+    # Test missing min_price
+    response = client.get("/api/v1/books/price-range?max_price=30")
+    assert response.status_code == 422
+    
+    # Test missing max_price
+    response = client.get("/api/v1/books/price-range?min_price=10")
+    assert response.status_code == 422
+    
+    # Test negative prices
+    response = client.get("/api/v1/books/price-range?min_price=-5&max_price=30")
+    assert response.status_code == 422  # FastAPI validates negative numbers at Query level
+    
+    response = client.get("/api/v1/books/price-range?min_price=10&max_price=-5")
+    assert response.status_code == 422  # FastAPI validates negative numbers at Query level
+    
+    # Test min_price > max_price
+    response = client.get("/api/v1/books/price-range?min_price=30&max_price=20")
+    assert response.status_code == 400
+    assert "min_price cannot be greater than max_price" in response.json()["detail"]
+    
+    # Test invalid page number
+    response = client.get("/api/v1/books/price-range?min_price=10&max_price=30&page=0")
+    assert response.status_code == 422
+    
+    # Test invalid limit
+    response = client.get("/api/v1/books/price-range?min_price=10&max_price=30&limit=0")
+    assert response.status_code == 422
+    
+    response = client.get("/api/v1/books/price-range?min_price=10&max_price=30&limit=101")
+    assert response.status_code == 422
+    
+    # Test invalid sort field
+    response = client.get("/api/v1/books/price-range?min_price=10&max_price=30&sort=invalid")
+    assert response.status_code == 422
+    
+    # Test invalid order
+    response = client.get("/api/v1/books/price-range?min_price=10&max_price=30&order=invalid")
+    assert response.status_code == 422
+
+
+def test_get_books_by_price_range_edge_cases(mock_books_csv):
+    """Test price range endpoint edge cases."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        # Test with zero as min_price
+        response = client.get("/api/v1/books/price-range?min_price=0&max_price=15")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Should return one book (£12.00)
+        assert len(data["data"]) == 1
+        assert data["data"][0]["price"] == 12.00
+        
+        # Test with very large max_price
+        response = client.get("/api/v1/books/price-range?min_price=0&max_price=1000")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Should return all books
+        assert len(data["data"]) == 4
+        assert data["metadata"]["count"] == 4
+
+
+def test_get_books_by_price_range_price_distribution(mock_books_csv):
+    """Test price distribution calculation."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=40")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        price_distribution = data["metadata"]["price_distribution"]
+        
+        # Should have 4 ranges
+        assert len(price_distribution) == 4
+        
+        # Each range should be a string key with integer count
+        for range_key, count in price_distribution.items():
+            assert isinstance(range_key, str)
+            assert isinstance(count, int)
+            assert count >= 0
+            assert "-" in range_key  # Should be in format "min-max"
+        
+        # Total count across ranges should equal total books
+        total_distributed = sum(price_distribution.values())
+        assert total_distributed == data["metadata"]["count"]
+
+
+def test_get_books_by_price_range_equal_min_max(mock_books_csv):
+    """Test price range where min equals max."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        # This should work but may return no books if no exact price match
+        response = client.get("/api/v1/books/price-range?min_price=15.50&max_price=15.50")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Should return empty results since no book has exactly £15.50
+        assert len(data["data"]) == 0
+        assert data["metadata"]["count"] == 0
+
+
+def test_get_books_by_price_range_response_structure(mock_books_csv):
+    """Test the structure of price range response matches specification."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=30")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Check top-level structure
+        expected_top_level = {"price_range", "data", "metadata", "pagination"}
+        assert set(data.keys()) == expected_top_level
+        
+        # Check price_range structure
+        price_range = data["price_range"]
+        assert set(price_range.keys()) == {"min", "max"}
+        assert isinstance(price_range["min"], (int, float))
+        assert isinstance(price_range["max"], (int, float))
+        
+        # Check metadata structure
+        metadata = data["metadata"]
+        expected_metadata_fields = {"count", "avg_price", "price_distribution"}
+        assert set(metadata.keys()) == expected_metadata_fields
+        assert isinstance(metadata["count"], int)
+        assert isinstance(metadata["avg_price"], (int, float))
+        assert isinstance(metadata["price_distribution"], dict)
+        
+        # Check pagination structure (same as other endpoints)
+        pagination = data["pagination"]
+        expected_pagination_fields = {"page", "limit", "total", "pages"}
+        assert set(pagination.keys()) == expected_pagination_fields
+        
+        # Check book structure (same as other endpoints)
+        if data["data"]:
+            book = data["data"][0]
+            expected_book_fields = {
+                "id", "title", "price", "price_display", "rating_text", 
+                "rating_numeric", "availability", "category", "image_url",
+                "description", "upc", "reviews"
+            }
+            assert set(book.keys()) == expected_book_fields
+
+
+def test_get_books_by_price_range_empty_data():
+    """Test price range endpoint with empty data file."""
+    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
+        fieldnames = ['id', 'title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        temp_file_path = f.name
+    
+    try:
+        with patch('app.api.books.books_data_service.data_file', temp_file_path):
+            response = client.get("/api/v1/books/price-range?min_price=10&max_price=30")
+            
+            assert response.status_code == 200
+            data = response.json()
+            
+            assert data["data"] == []
+            assert data["metadata"]["count"] == 0
+            assert data["metadata"]["avg_price"] == 0.0
+            assert data["metadata"]["price_distribution"] == {}
+            assert data["pagination"]["total"] == 0
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_get_books_by_price_range_nonexistent_file():
+    """Test price range endpoint when data file doesn't exist."""
+    nonexistent_path = "/nonexistent/path/books_data.csv"
+    
+    with patch('app.api.books.books_data_service.data_file', nonexistent_path):
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=30")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        assert data["data"] == []
+        assert data["metadata"]["count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_price_range_endpoint_content_type(mock_books_csv):
+    """Test that price range endpoint returns JSON content type."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=30")
+        assert response.headers["content-type"] == "application/json"
+
+
+def test_get_books_by_price_range_default_sort(mock_books_csv):
+    """Test that price range endpoint defaults to sorting by price."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/price-range?min_price=10&max_price=40")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Should be sorted by price ascending by default
+        prices = [book["price"] for book in data["data"]]
+        assert prices == sorted(prices)
+
+
+def test_get_books_by_price_range_single_book_range():
+    """Test price range that matches exactly one book."""
+    single_book_data = [
+        {
+            "id": 1,
+            "title": "Single Book",
+            "price": "£20.00",
+            "rating_text": "Four",
+            "rating_numeric": "4",
+            "availability": "In stock",
+            "category": "Fiction",
+            "image_url": "https://example.com/single.jpg",
+        }
+    ]
+    
+    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
+        fieldnames = ['id', 'title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(single_book_data)
+        temp_file_path = f.name
+    
+    try:
+        with patch('app.api.books.books_data_service.data_file', temp_file_path):
+            response = client.get("/api/v1/books/price-range?min_price=19&max_price=21")
+            
+            assert response.status_code == 200
+            data = response.json()
+            
+            assert len(data["data"]) == 1
+            assert data["data"][0]["title"] == "Single Book"
+            assert data["metadata"]["count"] == 1
+            assert data["metadata"]["avg_price"] == 20.0
+            
+            # Price distribution should have one range with count 1 for a small range
+            price_distribution = data["metadata"]["price_distribution"]
+            assert len(price_distribution) == 1  # Small range should create single distribution
+            assert sum(price_distribution.values()) == 1
+    finally:
+        os.unlink(temp_file_path)
