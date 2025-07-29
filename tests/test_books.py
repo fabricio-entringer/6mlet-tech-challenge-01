@@ -17,6 +17,7 @@ client = TestClient(app)
 # Sample test data
 SAMPLE_BOOKS_DATA = [
     {
+        "id": 1,
         "title": "Test Book 1",
         "price": "£19.99",
         "rating_text": "Four",
@@ -26,6 +27,7 @@ SAMPLE_BOOKS_DATA = [
         "image_url": "https://example.com/book1.jpg",
     },
     {
+        "id": 2,
         "title": "Test Book 2",
         "price": "£25.50",
         "rating_text": "Five",
@@ -35,6 +37,7 @@ SAMPLE_BOOKS_DATA = [
         "image_url": "https://example.com/book2.jpg",
     },
     {
+        "id": 3,
         "title": "Test Book 3",
         "price": "£12.00",
         "rating_text": "Three",
@@ -44,6 +47,7 @@ SAMPLE_BOOKS_DATA = [
         "image_url": "https://example.com/book3.jpg",
     },
     {
+        "id": 4,
         "title": "Test Book 4",
         "price": "£35.99",
         "rating_text": "Two",
@@ -335,7 +339,7 @@ def test_get_books_response_structure(mock_books_csv):
             assert set(book.keys()) == expected_fields
             
             # Check data types
-            assert isinstance(book["id"], str)
+            assert isinstance(book["id"], int)
             assert isinstance(book["title"], str)
             assert isinstance(book["price"], (int, float))
             assert isinstance(book["price_display"], str)
@@ -384,7 +388,7 @@ def test_get_book_by_id_success(mock_books_csv):
         assert "category" in data
         
         # Check that the ID matches
-        assert data["id"] == "book_001"
+        assert data["id"] == 1
         
         # Check that all required fields are present
         expected_fields = {
@@ -433,7 +437,7 @@ def test_get_book_by_id_specific_book(mock_books_csv):
         book = response.json()
         
         # This should correspond to the second book in SAMPLE_BOOKS_DATA
-        assert book["id"] == "book_002"
+        assert book["id"] == 2
         assert book["title"] == "Test Book 2"
         assert book["price"] == 25.50
         assert book["rating_numeric"] == 5

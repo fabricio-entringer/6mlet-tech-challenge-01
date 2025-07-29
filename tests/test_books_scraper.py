@@ -21,6 +21,7 @@ from bs4 import BeautifulSoup
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from scripts.book_sequence import BookSequence
 from scripts.books_scraper import BooksScraper
 from scripts.config import RATING_MAPPING
 
@@ -98,7 +99,8 @@ class TestBooksScraper(unittest.TestCase):
         """
 
         soup = BeautifulSoup(html, "html.parser")
-        book_data = self.scraper._extract_book_data(soup, "Poetry")
+        book_sequence = BookSequence(start_id=1)
+        book_data = self.scraper._extract_book_data(soup, "Poetry", book_sequence)
 
         self.assertEqual(book_data["title"], "A Light in the Attic")
         self.assertEqual(book_data["price"], "£51.77")

@@ -205,7 +205,7 @@ class BooksScraper:
         except Exception as e:
             self.logger.warning(f"Error extracting book data: {e}")
             return {
-                "id": book_id,
+                "id": book_sequence.get_next_id(),
                 "title": "Error",
                 "price": "Error",
                 "rating_text": "Error",
