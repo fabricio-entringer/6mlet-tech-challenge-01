@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 class Book(BaseModel):
     """Model representing a single book."""
 
+    id: int = Field(..., description="Unique book identifier")
     title: str = Field(..., description="Book title")
     price: float = Field(..., description="Book price in GBP")
     price_display: str = Field(..., description="Book price with currency symbol")
@@ -16,6 +17,9 @@ class Book(BaseModel):
     availability: str = Field(..., description="Stock availability status")
     category: str = Field(..., description="Book category")
     image_url: str = Field(..., description="URL to book cover image")
+    description: Optional[str] = Field(None, description="Book description")
+    upc: Optional[str] = Field(None, description="Universal Product Code")
+    reviews: Optional[str] = Field(None, description="Customer reviews summary")
 
 
 class PaginationInfo(BaseModel):
@@ -33,3 +37,9 @@ class BooksResponse(BaseModel):
     data: List[Book] = Field(..., description="List of books")
     pagination: PaginationInfo = Field(..., description="Pagination information")
     filters_applied: Optional[dict] = Field(None, description="Applied filters summary")
+
+
+class BookResponse(BaseModel):
+    """Response model for single book endpoint."""
+
+    data: Book = Field(..., description="Book details")

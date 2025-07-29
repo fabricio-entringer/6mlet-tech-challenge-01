@@ -40,7 +40,7 @@ class BooksDataService:
 
         return books
 
-    def _convert_book_data(self, book_row: Dict[str, str]) -> Optional[Book]:
+    def _convert_book_data(self, book_row: Dict[str, str], row_index: int) -> Optional[Book]:
         """Convert CSV row to Book model."""
         try:
             # Convert price to float
@@ -52,8 +52,9 @@ class BooksDataService:
             rating_numeric = int(book_row.get("rating_numeric", "0"))
             if not (1 <= rating_numeric <= 5):
                 rating_numeric = 0
-
+            
             return Book(
+                id=int(book_row.get("id", 0)),
                 title=book_row.get("title", "").strip(),
                 price=price_float,
                 price_display=book_row.get("price", "£0.00"),
@@ -62,6 +63,9 @@ class BooksDataService:
                 availability=book_row.get("availability", "").strip(),
                 category=book_row.get("category", "").strip(),
                 image_url=book_row.get("image_url", "").strip(),
+                description=book_row.get("description", "").strip() or None,
+                upc=book_row.get("upc", "").strip() or None,
+                reviews=book_row.get("reviews", "").strip() or None,
             )
         except (ValueError, TypeError) as e:
             # Skip invalid rows
@@ -167,8 +171,8 @@ class BooksDataService:
 
         # Convert to Book models, filtering out invalid rows
         all_books = []
-        for book_row in raw_books:
-            book = self._convert_book_data(book_row)
+        for index, book_row in enumerate(raw_books, start=1):
+            book = self._convert_book_data(book_row, index)
             if book:
                 all_books.append(book)
 
@@ -234,6 +238,28 @@ class BooksDataService:
             pagination=pagination,
             filters_applied=filters_applied,
         )
+
+    def get_book_by_id(self, book_id: int) -> Optional[Book]:
+        """
+        Get a single book by its ID.
+
+        Args:
+            book_id: The unique identifier of the book
+
+        Returns:
+            Book object if found, None otherwise
+        """
+        
+        # Load books from CSV
+        raw_books = self._load_books_from_csv()
+        
+        # Convert to Book models and find the one with matching ID
+        for index, book_row in enumerate(raw_books, start=1):
+            book = self._convert_book_data(book_row, index)
+            if book and book.id == book_id:
+                return book
+
+        return None
 
 
 # Initialize the data service
@@ -311,6 +337,62 @@ async def get_books(
             min_rating=min_rating,
             availability=availability,
         )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Internal server error: {str(e)}"
+        )
+
+
+async def get_book_by_id(book_id: int) -> Book:
+    """
+    Get complete details for a specific book by ID.
+
+    This endpoint returns the complete details of a single book identified by its unique ID.
+    The ID is a positive integer that corresponds to the book's position in the dataset.
+
+    **Path Parameters:**
+    - **book_id**: The unique identifier of the book (positive integer)
+
+    **Response includes:**
+    - **id**: Unique book identifier (format: book_XXX)
+    - **title**: Book title
+    - **price**: Numeric price value in GBP
+    - **price_display**: Formatted price with currency symbol
+    - **rating_text**: Rating in text format (e.g., 'Four')
+    - **rating_numeric**: Numeric rating from 1 to 5
+    - **availability**: Stock availability status
+    - **category**: Book category
+    - **image_url**: URL to book cover image
+    - **description**: Book description (if available)
+    - **upc**: Universal Product Code (if available)
+    - **reviews**: Customer reviews summary (if available)
+
+    **Error Responses:**
+    - **400**: Invalid book ID (must be positive integer)
+    - **404**: Book not found
+    - **500**: Internal server error
+    """
+    try:
+        # Validate book ID
+        if book_id <= 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid book ID. Must be a positive integer."
+            )
+
+        # Get the book
+        book = books_data_service.get_book_by_id(book_id)
+        
+        if not book:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Book with ID {book_id} not found"
+            )
+
+        return book
 
     except HTTPException:
         raise
