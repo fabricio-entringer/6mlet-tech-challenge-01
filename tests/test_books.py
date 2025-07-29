@@ -59,7 +59,7 @@ SAMPLE_BOOKS_DATA = [
 def mock_books_csv():
     """Create a temporary CSV file with test book data."""
     with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
-        fieldnames = ['title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
+        fieldnames = ['id', 'title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(SAMPLE_BOOKS_DATA)
@@ -280,7 +280,7 @@ def test_get_books_empty_data():
     """Test books endpoint with empty data file."""
     with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
         # Create empty CSV with just headers
-        fieldnames = ['title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
+        fieldnames = ['id', 'title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         temp_file_path = f.name
@@ -328,12 +328,14 @@ def test_get_books_response_structure(mock_books_csv):
         if data["data"]:
             book = data["data"][0]
             expected_fields = {
-                "title", "price", "price_display", "rating_text", 
-                "rating_numeric", "availability", "category", "image_url"
+                "id", "title", "price", "price_display", "rating_text", 
+                "rating_numeric", "availability", "category", "image_url",
+                "description", "upc", "reviews"
             }
             assert set(book.keys()) == expected_fields
             
             # Check data types
+            assert isinstance(book["id"], str)
             assert isinstance(book["title"], str)
             assert isinstance(book["price"], (int, float))
             assert isinstance(book["price_display"], str)
@@ -342,6 +344,10 @@ def test_get_books_response_structure(mock_books_csv):
             assert isinstance(book["availability"], str)
             assert isinstance(book["category"], str)
             assert isinstance(book["image_url"], str)
+            # Optional fields can be None or strings
+            assert book["description"] is None or isinstance(book["description"], str)
+            assert book["upc"] is None or isinstance(book["upc"], str)
+            assert book["reviews"] is None or isinstance(book["reviews"], str)
         
         # Check pagination structure
         pagination = data["pagination"]
@@ -361,3 +367,122 @@ async def test_books_endpoint_content_type(mock_books_csv):
     with patch('app.api.books.books_data_service.data_file', mock_books_csv):
         response = client.get("/api/v1/books")
         assert response.headers["content-type"] == "application/json"
+
+
+def test_get_book_by_id_success(mock_books_csv):
+    """Test getting a single book by ID successfully."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/1")
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Check that we get a single book object
+        assert "id" in data
+        assert "title" in data
+        assert "price" in data
+        assert "category" in data
+        
+        # Check that the ID matches
+        assert data["id"] == "book_001"
+        
+        # Check that all required fields are present
+        expected_fields = {
+            "id", "title", "price", "price_display", "rating_text", 
+            "rating_numeric", "availability", "category", "image_url",
+            "description", "upc", "reviews"
+        }
+        assert set(data.keys()) == expected_fields
+
+
+def test_get_book_by_id_not_found(mock_books_csv):
+    """Test getting a book by ID that doesn't exist."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/999")
+        
+        assert response.status_code == 404
+        data = response.json()
+        assert "Book with ID 999 not found" in data["detail"]
+
+
+def test_get_book_by_id_invalid_format():
+    """Test getting a book with invalid ID format."""
+    # Test invalid negative ID
+    response = client.get("/api/v1/books/-1")
+    assert response.status_code == 400
+    data = response.json()
+    assert "Invalid book ID. Must be a positive integer." in data["detail"]
+    
+    # Test zero ID (should be invalid)
+    response = client.get("/api/v1/books/0")
+    assert response.status_code == 400
+    data = response.json()
+    assert "Invalid book ID. Must be a positive integer." in data["detail"]
+    
+    # Test non-numeric ID (FastAPI will return 422 for this)
+    response = client.get("/api/v1/books/abc")
+    assert response.status_code == 422
+
+
+def test_get_book_by_id_specific_book(mock_books_csv):
+    """Test getting a specific book by ID and verify its content."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books/2")
+        
+        assert response.status_code == 200
+        book = response.json()
+        
+        # This should correspond to the second book in SAMPLE_BOOKS_DATA
+        assert book["id"] == "book_002"
+        assert book["title"] == "Test Book 2"
+        assert book["price"] == 25.50
+        assert book["rating_numeric"] == 5
+        assert book["category"] == "Mystery"
+
+
+def test_get_book_by_id_boundary_cases(mock_books_csv):
+    """Test boundary cases for book ID."""
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        # Test first book
+        response = client.get("/api/v1/books/1")
+        assert response.status_code == 200
+        
+        # Test last book (we have 4 sample books)
+        response = client.get("/api/v1/books/4")
+        assert response.status_code == 200
+        
+        # Test beyond available books
+        response = client.get("/api/v1/books/5")
+        assert response.status_code == 404
+
+
+def test_get_book_by_id_empty_data_file():
+    """Test getting a book by ID when data file is empty."""
+    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
+        # Create empty CSV with just headers
+        fieldnames = ['id', 'title', 'price', 'rating_text', 'rating_numeric', 'availability', 'category', 'image_url']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        temp_file_path = f.name
+    
+    try:
+        with patch('app.api.books.books_data_service.data_file', temp_file_path):
+            response = client.get("/api/v1/books/1")
+            
+            assert response.status_code == 404
+            data = response.json()
+            assert "Book with ID 1 not found" in data["detail"]
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_get_book_by_id_nonexistent_data_file():
+    """Test getting a book by ID when data file doesn't exist."""
+    nonexistent_path = "/nonexistent/path/books_data.csv"
+    
+    with patch('app.api.books.books_data_service.data_file', nonexistent_path):
+        response = client.get("/api/v1/books/1")
+        
+        assert response.status_code == 404
+        data = response.json()
+        assert "Book with ID 1 not found" in data["detail"]

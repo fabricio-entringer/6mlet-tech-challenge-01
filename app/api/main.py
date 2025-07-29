@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import BackgroundTasks, FastAPI, Query
 
 from ..models import (
+    BookResponse,
     BooksResponse,
     CategoriesResponse,
     HistoryResponse,
@@ -98,6 +99,12 @@ async def get_books(
     return await books.get_books(
         page, limit, category, sort, order, min_price, max_price, min_rating, availability
     )
+
+
+@app.get("/api/v1/books/{book_id}")
+async def get_book_by_id(book_id: int):
+    """Get complete details for a specific book by ID."""
+    return await books.get_book_by_id(book_id)
 
 
 if __name__ == "__main__":

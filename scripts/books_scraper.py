@@ -20,6 +20,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 
+from scripts.book_sequence import BookSequence
 from scripts.history_logger import ScrapingHistoryLogger, create_configuration_snapshot
 
 
@@ -153,7 +154,7 @@ class BooksScraper:
         return rating_map.get(rating_text, 0)
 
     def _extract_book_data(
-        self, book_element: BeautifulSoup, category: str
+        self, book_element: BeautifulSoup, category: str, book_sequence: BookSequence
     ) -> Dict[str, str]:
         """
         Extract data from a single book element.
@@ -191,6 +192,7 @@ class BooksScraper:
                 img_url = urljoin(self.base_url, img_element.get("src"))
 
             return {
+                "id": book_sequence.get_next_id(),
                 "title": title,
                 "price": price,
                 "rating_text": rating_text,
@@ -203,6 +205,7 @@ class BooksScraper:
         except Exception as e:
             self.logger.warning(f"Error extracting book data: {e}")
             return {
+                "id": book_id,
                 "title": "Error",
                 "price": "Error",
                 "rating_text": "Error",
@@ -245,7 +248,7 @@ class BooksScraper:
             return []
 
     def _scrape_category_pages(
-        self, category_url: str, category_name: str
+        self, category_url: str, category_name: str, book_sequence: BookSequence
     ) -> List[Dict[str, str]]:
         """
         Scrape all pages within a category.
@@ -274,7 +277,7 @@ class BooksScraper:
                 book_elements = soup.find_all("article", class_="product_pod")
 
                 for book_element in book_elements:
-                    book_data = self._extract_book_data(book_element, category_name)
+                    book_data = self._extract_book_data(book_element, category_name, book_sequence)
                     books.append(book_data)
 
                 # Find next page link
@@ -335,10 +338,13 @@ class BooksScraper:
 
             all_books = []
 
+            # Initialize book sequence for unique IDs
+            book_sequence = BookSequence()
+
             for category in categories:
                 try:
                     category_books = self._scrape_category_pages(
-                        category["url"], category["name"]
+                        category["url"], category["name"], book_sequence
                     )
                     all_books.extend(category_books)
                 except Exception as e:
@@ -472,6 +478,7 @@ class BooksScraper:
 
         # Define CSV headers
         headers = [
+            "id",
             "title",
             "price",
             "rating_text",
