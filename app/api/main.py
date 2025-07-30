@@ -15,6 +15,15 @@ from ..models import (
     TopRatedBooksResponse,
     PriceRangeBooksResponse,
 )
+from ..ml import (
+    FeatureEngineer,
+    TrainingDataProcessor, 
+    PredictionService,
+    MLFeaturesResponse,
+    TrainingDataResponse,
+    PredictionRequest,
+    PredictionResponse
+)
 from ..utils import get_version
 from . import books, categories, core, scraping
 
@@ -135,6 +144,106 @@ async def get_book_by_id(book_id: int):
     """Get complete details for a specific book by ID."""
     return await books.get_book_by_id(book_id)
 
+# ML Endpoints
+@app.get("/api/v1/ml/features", response_model=MLFeaturesResponse)
+async def get_ml_features(
+    format: str = "vector",
+    include_metadata: bool = True,
+    sample_size: Optional[int] = None,
+    shuffle: bool = False
+) -> MLFeaturesResponse:
+    """
+    Get feature vectors for ML models.
+    
+    This endpoint returns preprocessed features ready for machine learning models,
+    specifically designed for book price prediction tasks.
+    
+    Args:
+        format: Output format (currently only "vector" supported)
+        include_metadata: Whether to include metadata about features
+        sample_size: Number of samples to return (None for all)
+        shuffle: Whether to shuffle the data
+    
+    Returns:
+        MLFeaturesResponse with feature vectors and metadata
+    """
+    try:
+        engineer = FeatureEngineer()
+        features, metadata = engineer.get_features(sample_size=sample_size, shuffle=shuffle)
+        
+        return MLFeaturesResponse(
+            features=features,
+            metadata=metadata
+        )
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Book data not found. Please run the scraper first to collect data."
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating features: {str(e)}"
+        )
+
+
+@app.get("/api/v1/ml/training-data", response_model=TrainingDataResponse)
+async def get_training_data(
+    test_size: float = 0.2,
+    random_state: int = 42
+) -> TrainingDataResponse:
+    """
+    Get training data ready for ML model training.
+    
+    This endpoint returns data in a format ready for scikit-learn or similar
+    ML libraries, with train/test split already performed.
+    
+    Args:
+        test_size: Proportion of data to use for testing (0.0-1.0)
+        random_state: Random seed for reproducible splits
+    
+    Returns:
+        TrainingDataResponse with X_train, y_train, X_test, y_test
+    """
+    try:
+        # Create processor instance (this loads the CSV data automatically)
+        processor = TrainingDataProcessor()
+        # Process data: extract features, split into train/test, return sklearn-ready format
+        return processor.get_training_data(test_size=test_size, random_state=random_state)
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Book data not found. Please run the scraper first to collect data."
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating training data: {str(e)}"
+        )
+
+
+@app.post("/api/v1/ml/predictions", response_model=PredictionResponse)
+async def make_prediction(request: PredictionRequest) -> PredictionResponse:
+    """
+    Make price predictions for a book based on its features.
+    
+    Note: This is a mock endpoint that demonstrates the API structure.
+    In a real implementation, this would load a trained model and make actual predictions.
+    
+    Args:
+        request: Book features for prediction
+    
+    Returns:
+        PredictionResponse with predicted price and feature vector
+    """
+    try:
+        service = PredictionService()
+        return service.predict(request)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error making prediction: {str(e)}"
+        )
 
 if __name__ == "__main__":
     import uvicorn
