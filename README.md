@@ -183,6 +183,38 @@ The FastAPI application automatically generates comprehensive API documentation 
   - Can be imported into other API tools (Postman, Insomnia, etc.)
   - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/openapi.json>
 
+### ML-Ready Endpoints
+
+The API includes machine learning endpoints designed for book price prediction:
+
+- **`GET /api/v1/ml/features`** - Feature vectors for ML models
+  - **Description**: Returns preprocessed features ready for machine learning
+  - **Query Parameters**: 
+    - `sample_size`: Number of samples to return
+    - `shuffle`: Whether to shuffle the data
+    - `include_metadata`: Include feature engineering metadata
+  - **Response**: Feature vectors with normalization and one-hot encoding applied
+
+- **`GET /api/v1/ml/training-data`** - Training data with train/test split
+  - **Description**: Returns data ready for model training with sklearn
+  - **Query Parameters**:
+    - `test_size`: Proportion for test set (default: 0.2)
+    - `random_state`: Random seed for reproducibility
+  - **Response**: X_train, y_train, X_test, y_test arrays
+
+- **`POST /api/v1/ml/predictions`** - Price prediction endpoint
+  - **Description**: Predicts book price based on features
+  - **Request Body**:
+    ```json
+    {
+      "title": "Book Title",
+      "category": "Fiction",
+      "rating": 4,
+      "availability": "In stock"
+    }
+    ```
+  - **Response**: Predicted price with confidence interval
+
 ## Testing
 
 Run tests using pytest:
