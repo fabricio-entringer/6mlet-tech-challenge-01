@@ -79,24 +79,24 @@ def mock_books_csv():
 
 def test_get_books_basic(mock_books_csv):
     """Test basic books endpoint functionality."""
-    # For now, test with the actual data file to verify our implementation works
-    response = client.get("/api/v1/books?limit=5")
+    with patch('app.api.books.books_data_service.data_file', mock_books_csv):
+        response = client.get("/api/v1/books?limit=5")
         
-    assert response.status_code == 200
-    data = response.json()
-    
-    # Check response structure
-    assert "data" in data
-    assert "pagination" in data
-    assert isinstance(data["data"], list)
-    assert len(data["data"]) <= 5  # We limited to 5 books
-    
-    # Check pagination structure
-    pagination = data["pagination"]
-    assert pagination["page"] == 1
-    assert pagination["limit"] == 5
-    assert pagination["total"] >= 5  # Should have at least 5 books in real data
-    assert pagination["pages"] >= 1
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Check response structure
+        assert "data" in data
+        assert "pagination" in data
+        assert isinstance(data["data"], list)
+        assert len(data["data"]) <= 5  # We limited to 5 books
+        
+        # Check pagination structure
+        pagination = data["pagination"]
+        assert pagination["page"] == 1
+        assert pagination["limit"] == 5
+        assert pagination["total"] == 4  # Mock data has exactly 4 books
+        assert pagination["pages"] == 1
 
 
 def test_get_books_pagination(mock_books_csv):
