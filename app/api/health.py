@@ -1,4 +1,76 @@
-"""Enhanced health check service for Issue #14."""
+"""Enhanced health check endpoints with comprehensive system monitoring."""
+
+import csv
+import psutil
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Tuple, Optional
+
+from ..data import get_data_service
+from ..models import (
+    HealthResponse,
+    ComponentHealth,
+    SystemStats,
+    DataStats,
+)
+from ..utils import get_version
+
+
+class HealthService:
+    """Service for comprehensive health checks."""
+
+    def __init__(self):
+        """Initialize health service."""
+        self.start_time = datetime.now(timezone.utc)
+        self.data_service = get_data_service()
+
+    def _check_data_file_health(self) -> Tuple[ComponentHealth, DataStats]:
+        """Check the health of the CSV data file using the new data service."""
+        now = datetime.now(timezone.utc)
+        
+        try:
+            # Get health check from data service
+            health_info = self.data_service.health_check()
+            
+            if health_info["status"] == "healthy":
+                status = "healthy"
+                details = health_info["details"]
+            else:
+                status = "unhealthy"
+                details = f"Data service unhealthy: {health_info['details']}"
+            
+            # Get statistics from data service
+            stats = self.data_service.get_statistics()
+            cache_stats = stats.get("cache", {})
+            
+            return (
+                ComponentHealth(
+                    status=status,
+                    details=details,
+                    last_checked=now
+                ),
+                DataStats(
+                    total_books=cache_stats.get("total_books", 0),
+                    total_categories=cache_stats.get("total_categories", 0),
+                    last_updated=datetime.fromisoformat(cache_stats["last_updated"]) if cache_stats.get("last_updated") else None,
+                    file_size_mb=stats.get("loader", {}).get("file_size_bytes", 0) / (1024 * 1024) if stats.get("loader", {}).get("file_size_bytes") else 0.0
+                )
+            )
+            
+        except Exception as e:
+            return (
+                ComponentHealth(
+                    status="unhealthy",
+                    details=f"Error checking data service: {str(e)}",
+                    last_checked=now
+                ),
+                DataStats(
+                    total_books=0,
+                    total_categories=0,
+                    last_updated=None,
+                    file_size_mb=0.0
+                )
+            )
 
 import os
 import psutil

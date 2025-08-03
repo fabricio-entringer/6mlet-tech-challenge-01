@@ -6,28 +6,48 @@ from typing import Dict, List, Tuple, Optional
 from pathlib import Path
 
 from .models import FeatureVector, FeatureMetadata, NormalizationInfo, EncodingInfo
+from ..data import get_data_service
 
 
 class FeatureEngineer:
     """Feature engineering for book price prediction - Endpoint 1"""
     
     def __init__(self, data_path: str = "data/books_data.csv"):
-        """Initialize feature engineer with data."""
+        """Initialize feature engineer with data service."""
         self.data_path = Path(data_path)
         self.df = None
         self.categories = []
         self.price_stats = {}
+        
+        # Use the new data service for efficient data access
+        self.data_service = get_data_service()
         self._load_data()
     
     def _load_data(self):
-        """Load and preprocess data."""
+        """Load and preprocess data using the data service."""
+        # Try to load data using the new data service first
+        df = self.data_service.csv_loader.load_dataframe()
+        
+        if df is not None:
+            self.df = df
+            self._process_data_from_dataframe()
+        else:
+            # Fallback to original method if data service fails
+            self._load_data_fallback()
+    
+    def _load_data_fallback(self):
+        """Fallback data loading method."""
         if not self.data_path.exists():
             raise FileNotFoundError(f"Data file not found: {self.data_path}")
         
         self.df = pd.read_csv(self.data_path)
-        
-        # Extract numeric price from string
-        self.df['price_numeric'] = self.df['price'].str.extract(r'([0-9.]+)').astype(float)
+        self._process_data_from_dataframe()
+    
+    def _process_data_from_dataframe(self):
+        """Process data from pandas DataFrame."""
+        # Extract numeric price from string (if not already done)
+        if 'price_numeric' not in self.df.columns:
+            self.df['price_numeric'] = self.df['price'].str.extract(r'([0-9.]+)').astype(float)
         
         # Fix invalid category
         # "Add a comment" changed to "Default" to preserve data instead of removing records
