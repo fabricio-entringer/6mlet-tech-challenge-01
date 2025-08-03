@@ -20,10 +20,6 @@ def test_health_check_endpoint():
     
     data = response.json()
     
-    # For 503 responses, the data is in the detail field
-    if response.status_code == 503:
-        data = data["detail"]
-    
     # Check required fields in response
     assert "status" in data
     assert "version" in data
