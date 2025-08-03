@@ -2,7 +2,7 @@
 
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class Book(BaseModel):
@@ -10,7 +10,7 @@ class Book(BaseModel):
 
     id: int = Field(..., description="Unique book identifier")
     title: str = Field(..., description="Book title")
-    price: float = Field(..., description="Book price in GBP")
+    price: float = Field(..., gt=0, description="Book price in GBP")
     price_display: str = Field(..., description="Book price with currency symbol")
     rating_text: str = Field(..., description="Rating in text format (e.g., 'Four')")
     rating_numeric: int = Field(..., ge=1, le=5, description="Numeric rating from 1 to 5")
@@ -20,6 +20,25 @@ class Book(BaseModel):
     description: Optional[str] = Field(None, description="Book description")
     upc: Optional[str] = Field(None, description="Universal Product Code")
     reviews: Optional[str] = Field(None, description="Customer reviews summary")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "title": "A Light in the Attic",
+                "price": 51.77,
+                "price_display": "£51.77",
+                "rating_text": "Three",
+                "rating_numeric": 3,
+                "availability": "In stock",
+                "category": "Poetry",
+                "image_url": "https://books.toscrape.com/media/cache/2c/da/2cdad67c44b002e7ead0cc35693c0e8b.jpg",
+                "description": "A collection of poetry and drawings.",
+                "upc": "a897fe39b1053632",
+                "reviews": "Great collection of poems!"
+            }
+        }
+    )
 
 
 class PaginationInfo(BaseModel):
@@ -37,6 +56,39 @@ class BooksResponse(BaseModel):
     data: List[Book] = Field(..., description="List of books")
     pagination: PaginationInfo = Field(..., description="Pagination information")
     filters_applied: Optional[dict] = Field(None, description="Applied filters summary")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "data": [
+                    {
+                        "id": 1,
+                        "title": "A Light in the Attic",
+                        "price": 51.77,
+                        "price_display": "£51.77",
+                        "rating_text": "Three",
+                        "rating_numeric": 3,
+                        "availability": "In stock",
+                        "category": "Poetry",
+                        "image_url": "https://books.toscrape.com/media/cache/2c/da/2cdad67c44b002e7ead0cc35693c0e8b.jpg",
+                        "description": "A collection of poetry and drawings.",
+                        "upc": "a897fe39b1053632",
+                        "reviews": "Great collection of poems!"
+                    }
+                ],
+                "pagination": {
+                    "page": 1,
+                    "limit": 20,
+                    "total": 1000,
+                    "pages": 50
+                },
+                "filters_applied": {
+                    "category": "Poetry",
+                    "min_rating": 3
+                }
+            }
+        }
+    )
 
 
 class TopRatedMetadata(BaseModel):
