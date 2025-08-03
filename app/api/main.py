@@ -191,6 +191,12 @@ async def get_book_by_id(book_id: int):
     """Get complete details for a specific book by ID."""
     return await books.get_book_by_id(book_id)
 
+
+@app.post("/api/v1/books/refresh")
+async def refresh_books_data():
+    """Refresh book data cache from CSV file without API downtime."""
+    return await books.refresh_books_data()
+
 # ML Endpoints
 @app.get("/api/v1/ml/features", response_model=MLFeaturesResponse)
 async def get_ml_features(
