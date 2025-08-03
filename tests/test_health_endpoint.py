@@ -69,10 +69,6 @@ class TestHealthEndpoint:
         assert response.status_code in [200, 503]
         data = response.json()
         
-        # For unhealthy response, data is in the detail field
-        if response.status_code == 503:
-            data = data["detail"]
-        
         # Data component should reflect the missing file
         assert data["components"]["data_files"]["status"] in ["unhealthy", "degraded"]
         assert data["data"]["total_books"] == 0
@@ -187,12 +183,10 @@ class TestHealthEndpoint:
         # Should be unhealthy due to high memory usage, but expect 503 status code
         assert response.status_code == 503
         
-        # The response should contain the error details
+        # The response should contain the health status directly
         data = response.json()
-        assert "detail" in data
-        detail = data["detail"]
-        assert detail["status"] == "unhealthy"
-        assert detail["components"]["memory"]["status"] == "unhealthy"
+        assert data["status"] == "unhealthy"
+        assert data["components"]["memory"]["status"] == "unhealthy"
 
     @patch('app.api.health.HealthService._get_data_file_path')
     @patch('app.api.health.psutil.virtual_memory')

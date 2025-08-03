@@ -60,12 +60,17 @@ async def health_check():
     
     Returns 200 for healthy/degraded status, 503 for unhealthy status.
     """
+    from fastapi import Response
     health_response = await core.health_check()
     
     # Return appropriate HTTP status based on health
     if health_response.status == "unhealthy":
-        from fastapi import HTTPException
-        raise HTTPException(status_code=503, detail=health_response.model_dump(mode='json'))
+        # Set status code to 503 but return the response directly
+        return Response(
+            content=health_response.model_dump_json(),
+            status_code=503,
+            media_type="application/json"
+        )
     
     return health_response
 
