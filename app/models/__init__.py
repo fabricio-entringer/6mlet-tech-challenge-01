@@ -21,6 +21,12 @@ from .category_stats import (
     AvailabilityStats,
     StatsSummary
 )
+from .overview_stats import (
+    OverviewStatsResponse,
+    PriceStats,
+    RatingDistributionStats,
+    AvailabilityOverview
+)
 from .execution_history_item import ExecutionHistoryItem
 from .history_response import HistoryResponse
 from .scraping_request import ScrapingRequest
@@ -47,6 +53,10 @@ __all__ = [
     "RatingDistribution",
     "AvailabilityStats",
     "StatsSummary",
+    "OverviewStatsResponse",
+    "PriceStats",
+    "RatingDistributionStats",
+    "AvailabilityOverview",
     "ScrapingRequest",
     "ScrapingResponse",
     "ExecutionHistoryItem",

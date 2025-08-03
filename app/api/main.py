@@ -9,6 +9,7 @@ from ..models import (
     BooksResponse,
     CategoriesResponse,
     CategoryStatsResponse,
+    OverviewStatsResponse,
     HistoryResponse,
     ScrapingRequest,
     ScrapingResponse,
@@ -26,7 +27,7 @@ from ..ml import (
     PredictionResponse
 )
 from ..utils import get_version
-from . import books, categories, category_stats, core, scraping
+from . import books, categories, category_stats, overview_stats, core, scraping
 
 app_version = get_version()
 
@@ -101,6 +102,12 @@ async def get_category_statistics(
 ) -> CategoryStatsResponse:
     """Get detailed statistics for book categories including metrics like average price, rating distribution, and book counts."""
     return await category_stats.get_category_statistics(categories, include_distribution)
+
+
+@app.get("/api/v1/stats/overview", response_model=OverviewStatsResponse)
+async def get_overview_statistics() -> OverviewStatsResponse:
+    """Get comprehensive overview statistics for the book catalog including total counts, price metrics, rating distribution, availability stats, category count, and data freshness indicators."""
+    return await overview_stats.get_overview_statistics()
 
 
 # Books endpoints
