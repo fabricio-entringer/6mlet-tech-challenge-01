@@ -56,6 +56,15 @@ class TestOverviewStatsService:
         assert result.max == 30.0
         assert result.median == 20.0
 
+    def test_calculate_price_stats_with_even_count(self):
+        """Test _calculate_price_stats with even number of prices."""
+        prices = [10.0, 20.0, 30.0, 40.0]
+        result = self.service._calculate_price_stats(prices)
+        assert result.average == 25.0
+        assert result.min == 10.0
+        assert result.max == 40.0
+        assert result.median == 25.0  # (20 + 30) / 2
+
     def test_calculate_rating_distribution_empty(self):
         """Test _calculate_rating_distribution with empty list."""
         result = self.service._calculate_rating_distribution([])
