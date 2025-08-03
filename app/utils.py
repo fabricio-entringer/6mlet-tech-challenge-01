@@ -55,47 +55,6 @@ def convert_price_to_float(price_str: str) -> Optional[float]:
         return None
 
 
-def convert_rating_to_float(rating_str: str) -> Optional[float]:
-    """
-    Convert rating string to float.
-
-    This function converts rating strings to float values, handling various formats
-    and validating that ratings are within expected range (0-5).
-
-    Args:
-        rating_str: Rating string to convert (e.g., "4.5", "Three", etc.)
-
-    Returns:
-        Float value of the rating, or None if conversion fails or out of range
-
-    Examples:
-        >>> convert_rating_to_float("4.5")
-        4.5
-        >>> convert_rating_to_float("Three")
-        None
-        >>> convert_rating_to_float("6.0")  # Out of range
-        None
-    """
-    if not rating_str or not isinstance(rating_str, str):
-        return None
-
-    try:
-        # Clean the string
-        cleaned = rating_str.strip()
-
-        # Convert to float
-        rating_float = float(cleaned)
-
-        # Validate rating range (typically 0-5 for star ratings)
-        if rating_float < 0 or rating_float > 5:
-            return None
-
-        return rating_float
-
-    except (ValueError, TypeError):
-        return None
-
-
 def convert_rating_to_float(
     rating_str: str, default_value: float = 0
 ) -> Optional[float]:

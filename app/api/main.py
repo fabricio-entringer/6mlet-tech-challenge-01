@@ -2,12 +2,13 @@
 
 from typing import Optional
 
-from fastapi import BackgroundTasks, FastAPI, Query
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
 
 from ..models import (
     BookResponse,
     BooksResponse,
     CategoriesResponse,
+    CategoryStatsResponse,
     HistoryResponse,
     ScrapingRequest,
     ScrapingResponse,
@@ -25,7 +26,7 @@ from ..ml import (
     PredictionResponse
 )
 from ..utils import get_version
-from . import books, categories, core, scraping
+from . import books, categories, category_stats, core, scraping
 
 app_version = get_version()
 
@@ -85,6 +86,21 @@ async def get_categories(
 ) -> CategoriesResponse:
     """Get all book categories with optional statistics."""
     return await categories.get_categories(sort, order, include_stats)
+
+
+@app.get("/api/v1/stats/categories", response_model=CategoryStatsResponse)
+async def get_category_statistics(
+    categories: Optional[str] = Query(
+        None, 
+        description="Comma-separated list of category names to include (e.g., 'Fiction,Mystery')"
+    ),
+    include_distribution: bool = Query(
+        True, 
+        description="Include rating distribution in response"
+    ),
+) -> CategoryStatsResponse:
+    """Get detailed statistics for book categories including metrics like average price, rating distribution, and book counts."""
+    return await category_stats.get_category_statistics(categories, include_distribution)
 
 
 # Books endpoints

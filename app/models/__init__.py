@@ -13,6 +13,14 @@ from .book import (
     PriceRangeBooksResponse
 )
 from .category import CategoriesResponse, Category, PriceRange
+from .category_stats import (
+    CategoryStatsResponse,
+    CategoryStatsItem,
+    CategoryStatistics,
+    RatingDistribution,
+    AvailabilityStats,
+    StatsSummary
+)
 from .execution_history_item import ExecutionHistoryItem
 from .history_response import HistoryResponse
 from .scraping_request import ScrapingRequest
@@ -33,6 +41,12 @@ __all__ = [
     "Category",
     "CategoriesResponse",
     "PriceRange",
+    "CategoryStatsResponse",
+    "CategoryStatsItem",
+    "CategoryStatistics",
+    "RatingDistribution",
+    "AvailabilityStats",
+    "StatsSummary",
     "ScrapingRequest",
     "ScrapingResponse",
     "ExecutionHistoryItem",
