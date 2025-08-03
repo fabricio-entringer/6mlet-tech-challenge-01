@@ -17,14 +17,17 @@ async def root() -> Dict[str, str]:
     return {"message": "Welcome to 6MLET Tech Challenge 01 API"}
 
 
-async def health_check() -> Dict[str, str]:
+async def health_check():
     """
-    Health check endpoint.
-
-    Returns:
-        Dict[str, str]: A dictionary indicating the service status
+    Enhanced health check endpoint - delegates to health service.
+    
+    Returns comprehensive health information including system status,
+    data availability, and component health.
     """
-    return {"status": "healthy"}
+    # Create a new instance for each request to allow proper testing/mocking
+    from .health import HealthService
+    service = HealthService()
+    return await service.get_comprehensive_health()
 
 
 async def get_version_endpoint() -> Dict[str, str]:

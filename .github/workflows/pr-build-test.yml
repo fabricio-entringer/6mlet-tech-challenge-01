@@ -58,7 +58,7 @@ jobs:
         python -c "from app.main import app; print('App imported successfully')"
         timeout 10s python run.py &
         sleep 5
-        curl -f http://localhost:8000/health || exit 1
+        curl -f http://localhost:8000/api/v1/health || exit 1
         curl -f http://localhost:8000/version || exit 1
         pkill -f "python run.py" || true
 

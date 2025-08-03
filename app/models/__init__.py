@@ -32,6 +32,13 @@ from .history_response import HistoryResponse
 from .scraping_request import ScrapingRequest
 from .scraping_response import ScrapingResponse
 from .status_response import StatusResponse
+from .health_response import (
+    HealthResponse,
+    LegacyHealthResponse,
+    ComponentHealth,
+    DataStats,
+    SystemStats
+)
 
 __all__ = [
     "Book",
@@ -62,4 +69,9 @@ __all__ = [
     "ExecutionHistoryItem",
     "HistoryResponse",
     "StatusResponse",
+    "HealthResponse",
+    "LegacyHealthResponse", 
+    "ComponentHealth",
+    "DataStats",
+    "SystemStats",
 ]

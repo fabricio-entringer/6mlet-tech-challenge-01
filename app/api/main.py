@@ -16,6 +16,7 @@ from ..models import (
     StatusResponse,
     TopRatedBooksResponse,
     PriceRangeBooksResponse,
+    HealthResponse,
 )
 from ..ml import (
     FeatureEngineer,
@@ -45,10 +46,33 @@ async def root():
     return await core.root()
 
 
-@app.get("/health")
+@app.get("/api/v1/health", response_model=HealthResponse)
 async def health_check():
-    """Health check endpoint."""
-    return await core.health_check()
+    """
+    Comprehensive health check endpoint.
+    
+    Returns detailed health information including:
+    - Overall system status
+    - Component health (API, data files, memory)
+    - Data statistics (book count, categories)
+    - System resource monitoring
+    - API version and uptime information
+    
+    Returns 200 for healthy/degraded status, 503 for unhealthy status.
+    """
+    from fastapi import Response
+    health_response = await core.health_check()
+    
+    # Return appropriate HTTP status based on health
+    if health_response.status == "unhealthy":
+        # Set status code to 503 but return the response directly
+        return Response(
+            content=health_response.model_dump_json(),
+            status_code=503,
+            media_type="application/json"
+        )
+    
+    return health_response
 
 
 @app.get("/version")
