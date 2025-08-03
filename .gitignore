@@ -81,6 +81,7 @@ data/*.json
 data/*.xlsx
 data/*
 !data/.gitkeep
+!data/sample_books_data.csv
 
 # Sphinx documentation
 docs/_build/

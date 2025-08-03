@@ -1,0 +1,11 @@
+id,title,price,rating_text,rating_numeric,availability,category,image_url
+1,Sample Book 1,£25.99,Four,4,In stock,Fiction,https://example.com/book1.jpg
+2,Sample Book 2,£15.50,Three,3,In stock,Mystery,https://example.com/book2.jpg
+3,Sample Book 3,£35.75,Five,5,In stock,Science,https://example.com/book3.jpg
+4,Sample Book 4,£12.25,Two,2,Out of stock,Fiction,https://example.com/book4.jpg
+5,Sample Book 5,£42.00,Four,4,In stock,Travel,https://example.com/book5.jpg
+6,Sample Book 6,£28.99,Three,3,In stock,Mystery,https://example.com/book6.jpg
+7,Sample Book 7,£55.50,Five,5,In stock,Science,https://example.com/book7.jpg
+8,Sample Book 8,£18.75,One,1,Out of stock,Fiction,https://example.com/book8.jpg
+9,Sample Book 9,£33.25,Four,4,In stock,Travel,https://example.com/book9.jpg
+10,Sample Book 10,£21.99,Two,2,In stock,Mystery,https://example.com/book10.jpg
