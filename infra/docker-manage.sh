@@ -45,9 +45,9 @@ check_compose() {
     fi
 }
 
-# Function to setup development environment
-setup_dev() {
-    print_status "Setting up development environment..."
+# Function to setup environment
+setup() {
+    print_status "Setting up Docker environment..."
     
     # Copy environment file if it doesn't exist
     if [ ! -f .env ]; then
@@ -58,11 +58,11 @@ setup_dev() {
         print_warning ".env file already exists"
     fi
     
-    # Build and start development containers
-    print_status "Building and starting development containers..."
+    # Build and start containers
+    print_status "Building and starting containers..."
     docker-compose up --build -d
     
-    print_success "Development environment started!"
+    print_success "Docker environment started!"
     print_status "API available at: http://localhost:${API_PORT:-8000}"
     print_status "Health check: http://localhost:${API_PORT:-8000}/health"
     print_status "API docs: http://localhost:${API_PORT:-8000}/docs"
@@ -71,38 +71,17 @@ setup_dev() {
 # Function to setup production environment
 setup_prod() {
     print_status "Setting up production environment..."
-    
-    # Copy production environment file if it doesn't exist
-    if [ ! -f .env ]; then
-        cp .env.production .env
-        print_success "Created .env file from production template"
-        print_warning "Please review and modify .env file with production values"
-    else
-        print_warning ".env file already exists"
-    fi
-    
-    # Build and start production containers
-    print_status "Building and starting production containers..."
-    docker-compose -f docker-compose.prod.yml up --build -d
-    
-    print_success "Production environment started!"
-    print_status "API available at: http://localhost:8080"
+    setup
 }
 
 # Function to stop all containers
 stop_all() {
     print_status "Stopping all containers..."
     
-    # Stop development containers
+    # Stop containers
     if docker-compose ps -q >/dev/null 2>&1; then
         docker-compose down
-        print_success "Development containers stopped"
-    fi
-    
-    # Stop production containers
-    if docker-compose -f docker-compose.prod.yml ps -q >/dev/null 2>&1; then
-        docker-compose -f docker-compose.prod.yml down
-        print_success "Production containers stopped"
+        print_success "Containers stopped"
     fi
 }
 
@@ -115,10 +94,9 @@ cleanup() {
     
     # Remove volumes
     docker volume rm 6mlet-data 6mlet-logs 2>/dev/null || true
-    docker volume rm 6mlet-data-prod 6mlet-logs-prod 2>/dev/null || true
     
     # Remove networks
-    docker network rm 6mlet-network 6mlet-network-prod 2>/dev/null || true
+    docker network rm 6mlet-network 2>/dev/null || true
     
     # Prune unused images
     docker image prune -f
@@ -129,15 +107,9 @@ cleanup() {
 # Function to show logs
 show_logs() {
     local service=${1:-api}
-    local env=${2:-dev}
     
-    print_status "Showing logs for $service ($env environment)..."
-    
-    if [ "$env" = "prod" ]; then
-        docker-compose -f docker-compose.prod.yml logs -f $service
-    else
-        docker-compose logs -f $service
-    fi
+    print_status "Showing logs for $service..."
+    docker-compose logs -f $service
 }
 
 # Function to backup data
@@ -151,25 +123,17 @@ backup_data() {
     # Create backup directory if it doesn't exist
     mkdir -p $backup_dir
     
-    # Backup development data
+    # Backup data
     if docker volume ls | grep -q 6mlet-data; then
         docker run --rm -v 6mlet-data:/data -v $(pwd)/$backup_dir:/backup alpine \
-            tar czf /backup/dev_$backup_file -C /data .
-        print_success "Development data backed up to $backup_dir/dev_$backup_file"
-    fi
-    
-    # Backup production data
-    if docker volume ls | grep -q 6mlet-data-prod; then
-        docker run --rm -v 6mlet-data-prod:/data -v $(pwd)/$backup_dir:/backup alpine \
-            tar czf /backup/prod_$backup_file -C /data .
-        print_success "Production data backed up to $backup_dir/prod_$backup_file"
+            tar czf /backup/$backup_file -C /data .
+        print_success "Data backed up to $backup_dir/$backup_file"
     fi
 }
 
 # Function to restore data
 restore_data() {
     local backup_file=$1
-    local env=${2:-dev}
     
     if [ -z "$backup_file" ]; then
         print_error "Please provide backup file path"
@@ -181,12 +145,9 @@ restore_data() {
         exit 1
     fi
     
-    print_status "Restoring data from $backup_file ($env environment)..."
+    print_status "Restoring data from $backup_file..."
     
     local volume_name="6mlet-data"
-    if [ "$env" = "prod" ]; then
-        volume_name="6mlet-data-prod"
-    fi
     
     docker run --rm -v $volume_name:/data -v $(pwd):/backup alpine \
         tar xzf /backup/$backup_file -C /data
@@ -201,21 +162,18 @@ show_help() {
     echo "Usage: $0 [COMMAND] [OPTIONS]"
     echo ""
     echo "Commands:"
-    echo "  setup-dev                 Setup development environment"
-    echo "  setup-prod                Setup production environment"
+    echo "  setup                     Setup Docker environment"
     echo "  stop                      Stop all containers"
     echo "  cleanup                   Clean up all Docker resources"
-    echo "  logs [service] [env]      Show logs (default: api, dev)"
+    echo "  logs [service]            Show logs (default: api)"
     echo "  backup                    Backup data volumes"
-    echo "  restore [file] [env]      Restore data from backup (default: dev)"
+    echo "  restore [file]            Restore data from backup"
     echo "  help                      Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0 setup-dev             # Start development environment"
-    echo "  $0 setup-prod            # Start production environment"
-    echo "  $0 logs api dev           # Show development API logs"
-    echo "  $0 logs api prod          # Show production API logs"
-    echo "  $0 restore backup.tar.gz  # Restore development data"
+    echo "  $0 setup                 # Start Docker environment"
+    echo "  $0 logs api              # Show API logs"
+    echo "  $0 restore backup.tar.gz # Restore data"
     echo ""
 }
 
@@ -230,11 +188,8 @@ main() {
     
     # Parse command
     case "$1" in
-        setup-dev)
-            setup_dev
-            ;;
-        setup-prod)
-            setup_prod
+        setup|setup-dev|setup-prod)
+            setup
             ;;
         stop)
             stop_all
@@ -243,13 +198,13 @@ main() {
             cleanup
             ;;
         logs)
-            show_logs "$2" "$3"
+            show_logs "$2"
             ;;
         backup)
             backup_data
             ;;
         restore)
-            restore_data "$2" "$3"
+            restore_data "$2"
             ;;
         help|--help|-h)
             show_help

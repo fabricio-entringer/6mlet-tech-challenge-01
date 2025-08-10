@@ -1,4 +1,4 @@
-.PHONY: help venv install test run clean clean-logs lint commit bump activate docker-setup-dev docker-setup-prod docker-stop docker-cleanup docker-logs docker-test docker-validate
+.PHONY: help venv install test run clean clean-logs lint commit bump activate docker-setup docker-stop docker-cleanup docker-logs docker-test docker-validate
 
 help:
 	@echo "Available commands:"
@@ -15,8 +15,7 @@ help:
 	@echo "  activate     - Show command to activate virtual environment"
 	@echo ""
 	@echo "Docker commands:"
-	@echo "  docker-setup-dev    - Setup and start Docker development environment"
-	@echo "  docker-setup-prod   - Setup and start Docker production environment"
+	@echo "  docker-setup        - Setup and start Docker environment"
 	@echo "  docker-stop         - Stop all Docker containers"
 	@echo "  docker-cleanup      - Clean up all Docker resources"
 	@echo "  docker-logs         - Show Docker container logs"
@@ -65,13 +64,9 @@ bump:
 	venv/bin/cz bump
 
 # Docker commands
-docker-setup-dev:
-	@echo "Setting up Docker development environment..."
-	cd infra && ./docker-manage.sh setup-dev
-
-docker-setup-prod:
-	@echo "Setting up Docker production environment..."
-	cd infra && ./docker-manage.sh setup-prod
+docker-setup:
+	@echo "Setting up Docker environment..."
+	cd infra && ./docker-manage.sh setup
 
 docker-stop:
 	@echo "Stopping Docker containers..."

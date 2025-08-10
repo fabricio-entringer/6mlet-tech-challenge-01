@@ -84,14 +84,6 @@ test_compose_syntax() {
     else
         print_fail "docker-compose.yml has syntax errors"
     fi
-    
-    run_test "Validating docker-compose.prod.yml syntax"
-    
-    if docker-compose -f docker-compose.prod.yml config >/dev/null 2>&1; then
-        print_pass "docker-compose.prod.yml syntax is valid"
-    else
-        print_fail "docker-compose.prod.yml has syntax errors"
-    fi
 }
 
 # Function to test environment files
@@ -103,32 +95,17 @@ test_env_files() {
     else
         print_fail ".env.example is missing"
     fi
-    
-    if [ -f .env.production ]; then
-        print_pass ".env.production exists"
-    else
-        print_fail ".env.production is missing"
-    fi
 }
 
 # Function to test Docker build process
 test_docker_build() {
-    run_test "Testing Docker build (development stage)"
+    run_test "Testing Docker build"
     
-    if docker build --target development -t 6mlet-test-dev -f Dockerfile .. >/dev/null 2>&1; then
-        print_pass "Development build successful"
-        docker rmi 6mlet-test-dev >/dev/null 2>&1 || true
+    if docker build -t 6mlet-test -f Dockerfile .. >/dev/null 2>&1; then
+        print_pass "Docker build successful"
+        docker rmi 6mlet-test >/dev/null 2>&1 || true
     else
-        print_fail "Development build failed"
-    fi
-    
-    run_test "Testing Docker build (production stage)"
-    
-    if docker build --target production -t 6mlet-test-prod -f Dockerfile .. >/dev/null 2>&1; then
-        print_pass "Production build successful"
-        docker rmi 6mlet-test-prod >/dev/null 2>&1 || true
-    else
-        print_fail "Production build failed"
+        print_fail "Docker build failed"
     fi
 }
 
@@ -206,18 +183,11 @@ test_docker_compose_config() {
 test_port_config() {
     run_test "Testing port configuration"
     
-    # Check development ports
+    # Check port mapping
     if docker-compose config | grep -q "8000:8000"; then
-        print_pass "Development port mapping is configured"
+        print_pass "Port mapping is configured"
     else
-        print_fail "Development port mapping is incorrect"
-    fi
-    
-    # Check production ports
-    if docker-compose -f docker-compose.prod.yml config | grep -q "8080:8000"; then
-        print_pass "Production port mapping is configured"
-    else
-        print_fail "Production port mapping is incorrect"
+        print_fail "Port mapping is incorrect"
     fi
 }
 
@@ -225,11 +195,11 @@ test_port_config() {
 test_security_config() {
     run_test "Testing security configuration"
     
-    # Check if production Dockerfile creates non-root user
+    # Check if Dockerfile creates non-root user
     if grep -q "groupadd.*appuser" Dockerfile && grep -q "useradd.*appuser" Dockerfile; then
-        print_pass "Non-root user is configured in production"
+        print_pass "Non-root user is configured"
     else
-        print_fail "Non-root user is not configured in production"
+        print_fail "Non-root user is not configured"
     fi
     
     # Check if USER directive is used
@@ -256,7 +226,7 @@ show_summary() {
         echo ""
         echo "Next steps:"
         echo "1. Copy .env.example to .env and customize as needed"
-        echo "2. Run './docker-manage.sh setup-dev' to start development environment"
+        echo "2. Run './docker-manage.sh setup' to start Docker environment"
         echo "3. Test the API at http://localhost:8000/health"
     else
         echo -e "${RED}Some tests failed. Please fix the issues before proceeding.${NC}"

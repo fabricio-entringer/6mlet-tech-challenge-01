@@ -4,17 +4,16 @@ This directory contains Docker configuration files for containerizing the 6MLET 
 
 ## Files Overview
 
-- `Dockerfile` - Multi-stage Docker build configuration
-- `docker-compose.yml` - Development environment setup
-- `docker-compose.prod.yml` - Production environment setup
+- `Dockerfile` - Docker build configuration for deployment
+- `docker-compose.yml` - Docker Compose setup for running the application
 - `.env.example` - Environment variables template
-- `.env.production` - Production environment template
 - `.dockerignore` - Files to exclude from Docker build context
-- `.gitignore` - Files to ignore in git for this directory
+- `docker-manage.sh` - Management script for Docker operations
+- `validate-setup.sh` - Setup validation script
 
 ## Quick Start
 
-### Development Environment
+### Setup Environment
 
 1. **Copy environment file:**
    ```bash
@@ -22,9 +21,11 @@ This directory contains Docker configuration files for containerizing the 6MLET 
    cp .env.example .env
    ```
 
-2. **Start development environment:**
+2. **Start the application:**
    ```bash
    docker-compose up --build
+   # or use the management script
+   ./docker-manage.sh setup
    ```
 
 3. **Access the application:**
@@ -32,46 +33,23 @@ This directory contains Docker configuration files for containerizing the 6MLET 
    - Health check: http://localhost:8000/health
    - API docs: http://localhost:8000/docs
 
-### Production Environment
-
-1. **Copy and configure production environment:**
-   ```bash
-   cd infra
-   cp .env.production .env
-   # Edit .env with proper production values
-   ```
-
-2. **Start production environment:**
-   ```bash
-   docker-compose -f docker-compose.prod.yml up --build -d
-   ```
-
-3. **Access the application:**
-   - API: http://localhost:8080
-
 ## Architecture
 
-### Multi-Stage Build
+### Single Image Build
 
-The Dockerfile uses multi-stage builds with two targets:
+The Dockerfile creates a production-ready image suitable for deployment in any environment:
 
-#### Development Stage
-- Hot reloading enabled
-- Development dependencies included
-- Runs as root for easier development
-- Includes test dependencies
-
-#### Production Stage
-- Optimized for security and performance
-- Runs as non-root user (`appuser`)
-- Multi-worker deployment with Uvicorn
-- Resource limits configured
+- **Security optimized**: Runs as non-root user (`appuser`)
+- **Minimal base image**: Python 3.12 slim for reduced attack surface
+- **Layer optimized**: Dependencies cached separately for faster rebuilds
+- **Health checks**: Built-in health monitoring
 
 ### Services
 
 #### API Service
-- **Development**: Hot reloading, source code mounted as volume
-- **Production**: Optimized build, resource limits, multiple workers
+- Single image deployment suitable for any environment
+- Environment-configurable behavior through variables
+- Persistent data and logs through Docker volumes
 
 #### Data Initialization Service
 - Copies CSV data files to persistent volumes on first run
@@ -81,7 +59,6 @@ The Dockerfile uses multi-stage builds with two targets:
 
 - **data_volume**: Persistent storage for CSV data files
 - **logs_volume**: Persistent storage for application logs
-- **Source code mounts** (dev only): Enable hot reloading
 
 ### Networks
 
@@ -91,22 +68,15 @@ The Dockerfile uses multi-stage builds with two targets:
 ## Environment Variables
 
 ### Core Settings
-- `ENVIRONMENT`: `development` or `production`
-- `LOG_LEVEL`: `debug`, `info`, `warning`, `error`
+- `ENVIRONMENT`: `production` (default) or `development`
+- `LOG_LEVEL`: `debug`, `info` (default), `warning`, `error`
 - `DATA_PATH`: Path to CSV data files (`/app/data`)
 - `API_HOST`: Host to bind to (`0.0.0.0`)
 - `API_PORT`: Port to bind to (`8000`)
 
-### Development Settings
-- `HOT_RELOAD`: Enable hot reloading (`true`)
-- `DEBUG`: Enable debug mode (`true`)
-
-### Production Settings
-- `WORKERS`: Number of Uvicorn workers (`4`)
-
 ## Health Checks
 
-Both development and production containers include health checks:
+The container includes health checks:
 - **Interval**: 30 seconds
 - **Timeout**: 10 seconds
 - **Start period**: 5 seconds
@@ -116,16 +86,51 @@ The health check calls the `/health` endpoint to verify the application is runni
 
 ## Security Features
 
-### Production Security
 - **Non-root user**: Application runs as `appuser`
-- **Read-only data**: Data volume mounted read-only in production
-- **Resource limits**: Memory and CPU limits configured
 - **Minimal base image**: Python 3.12 slim for reduced attack surface
+- **Isolated network**: Custom Docker network
+- **Environment variables**: Secure configuration management
 
-### Development Security
-- Isolated network
-- No sensitive data in images
-- Environment variables for configuration
+## Management Commands
+
+### Using Management Script
+```bash
+# Setup and start environment
+./docker-manage.sh setup
+
+# View logs
+./docker-manage.sh logs
+
+# Stop containers
+./docker-manage.sh stop
+
+# Clean up resources
+./docker-manage.sh cleanup
+
+# Backup data
+./docker-manage.sh backup
+
+# Restore data
+./docker-manage.sh restore backup.tar.gz
+```
+
+### Using Make Commands
+```bash
+# Setup Docker environment
+make docker-setup
+
+# View logs
+make docker-logs
+
+# Stop containers
+make docker-stop
+
+# Clean up resources
+make docker-cleanup
+
+# Validate setup
+make docker-validate
+```
 
 ## Volume Management
 
@@ -163,7 +168,7 @@ docker run --rm -v 6mlet-logs:/logs alpine ls -la /logs
    API_PORT=8001
    ```
 
-2. **Permission issues (development):**
+2. **Permission issues:**
    ```bash
    # Ensure proper ownership
    sudo chown -R $USER:$USER ../data ../logs
@@ -187,11 +192,7 @@ docker run --rm -v 6mlet-logs:/logs alpine ls -la /logs
 
 1. **Access container shell:**
    ```bash
-   # Development
    docker-compose exec api bash
-   
-   # Production
-   docker-compose -f docker-compose.prod.yml exec api bash
    ```
 
 2. **Check container logs:**
@@ -201,29 +202,28 @@ docker run --rm -v 6mlet-logs:/logs alpine ls -la /logs
 
 3. **Inspect container:**
    ```bash
-   docker inspect 6mlet-api-dev
+   docker inspect 6mlet-api
    ```
 
 ## Performance Optimization
 
 ### Build Optimization
-- Multi-stage builds reduce final image size
 - Layer caching for dependencies
 - `.dockerignore` excludes unnecessary files
+- Optimized base image selection
 
 ### Runtime Optimization
-- Production uses multiple Uvicorn workers
-- Resource limits prevent resource exhaustion
+- Non-root user for security
 - Health checks ensure container reliability
+- Persistent volumes for data
 
 ## Integration with Existing Project
 
 The Docker setup integrates seamlessly with the existing project structure:
 
-- **Source code**: Mounted as volumes in development
+- **Source code**: Application code built into container image
 - **Data files**: Persistent volumes for CSV data
 - **Configuration**: Environment variables for different stages
-- **Testing**: Development container includes test dependencies
 - **Logging**: Persistent log storage
 
 ## Multi-Architecture Support
@@ -240,19 +240,18 @@ docker buildx build --platform linux/amd64,linux/arm64 -f infra/Dockerfile .
 ## Deployment Scenarios
 
 ### Local Development
-- Hot reloading enabled
-- Source code mounted
-- Debug logging
-- Development dependencies
-
-### Staging/Testing
-- Production-like configuration
+- Quick setup with `docker-compose up`
+- Environment variables for customization
 - Persistent data storage
-- Health monitoring
-- Resource limits
 
-### Production
-- Optimized security
-- Multiple workers
-- Resource constraints
-- Monitoring ready
+### Production Deployment
+- Single image suitable for any container platform
+- Security hardened with non-root user
+- Health monitoring ready
+- Configurable through environment variables
+
+### Cloud Deployment
+- Compatible with Docker-based platforms
+- Environment variable configuration
+- Persistent volume support
+- Health check integration
