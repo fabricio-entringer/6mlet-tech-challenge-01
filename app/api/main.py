@@ -36,47 +36,55 @@ app_version = get_version()
 app = FastAPI(
     title="Books API",
     description="""
-    ## Tech Challenge - Books Catalog API
-    
-    A comprehensive REST API for managing and exploring a books catalog, built as part of the FIAP 6MLET tech challenge.
-    
-    ### Features
-    
-    * **Books Management**: Browse, search, and filter books with advanced pagination
-    * **Category Analytics**: Get detailed statistics and insights by book categories
-    * **Health Monitoring**: Comprehensive system health checks with detailed metrics
-    * **Data Scraping**: Automated book data collection and management
-    * **ML Pipeline**: Machine learning features for price prediction and analysis
-    * **Real-time Statistics**: Overview and category-specific statistics
-    
-    ### API Versioning
-    
-    This API follows semantic versioning. Current version includes:
-    - v1 endpoints for stable production use
-    - Comprehensive error handling and validation
-    - Rate limiting and performance optimization
-    
-    ### Data Source
-    
-    Book data is collected through web scraping from books.toscrape.com and stored locally for fast access.
-    
-    ### Authentication
-    
-    Currently, this API does not require authentication. All endpoints are publicly accessible.
-    In a production environment, consider implementing:
-    - API key authentication
-    - Rate limiting per user
-    - OAuth2 integration
-    
-    ### Error Handling
-    
-    The API uses standard HTTP status codes:
-    - **200**: Success
-    - **400**: Bad Request - Invalid parameters
-    - **404**: Not Found - Resource doesn't exist
-    - **422**: Validation Error - Invalid request body
-    - **500**: Internal Server Error
-    - **503**: Service Unavailable - System unhealthy
+<h2>Tech Challenge - Books Catalog API</h2>
+
+<p>A comprehensive REST API for managing and exploring a books catalog, built as part of the FIAP 6MLET tech challenge.</p>
+
+<h3>Features</h3>
+
+<ul>
+<li><strong>Books Management:</strong> Browse, search, and filter books with advanced pagination</li>
+<li><strong>Category Analytics:</strong> Get detailed statistics and insights by book categories</li>
+<li><strong>Health Monitoring:</strong> Comprehensive system health checks with detailed metrics</li>
+<li><strong>Data Scraping:</strong> Automated book data collection and management</li>
+<li><strong>ML Pipeline:</strong> Machine learning features for price prediction and analysis</li>
+<li><strong>Real-time Statistics:</strong> Overview and category-specific statistics</li>
+</ul>
+
+<h3>API Versioning</h3>
+
+<p>This API follows semantic versioning. Current version includes:</p>
+<ul>
+<li>v1 endpoints for stable production use</li>
+<li>Comprehensive error handling and validation</li>
+<li>Rate limiting and performance optimization</li>
+</ul>
+
+<h3>Data Source</h3>
+
+<p>Book data is collected through web scraping from books.toscrape.com and stored locally for fast access.</p>
+
+<h3>Authentication</h3>
+
+<p>Currently, this API does not require authentication. All endpoints are publicly accessible.</p>
+<p>In a production environment, consider implementing:</p>
+<ul>
+<li>API key authentication</li>
+<li>Rate limiting per user</li>
+<li>OAuth2 integration</li>
+</ul>
+
+<h3>Error Handling</h3>
+
+<p>The API uses standard HTTP status codes:</p>
+<ul>
+<li><strong>200:</strong> Success</li>
+<li><strong>400:</strong> Bad Request - Invalid parameters</li>
+<li><strong>404:</strong> Not Found - Resource doesn't exist</li>
+<li><strong>422:</strong> Validation Error - Invalid request body</li>
+<li><strong>500:</strong> Internal Server Error</li>
+<li><strong>503:</strong> Service Unavailable - System unhealthy</li>
+</ul>
     """,
     version=app_version,
     contact={
@@ -174,17 +182,21 @@ async def root():
     tags=["Health"],
     summary="Comprehensive Health Check",
     description="""
-    Comprehensive health check endpoint that monitors all critical system components.
-    
-    **Monitored Components:**
-    - API service availability
-    - Data file integrity and statistics  
-    - Memory usage and system resources
-    - Application uptime and version info
-    
-    **Response Codes:**
-    - 200: System healthy or degraded
-    - 503: System unhealthy (critical failures)
+Comprehensive health check endpoint that monitors all critical system components.
+
+<strong>Components Monitored:</strong>
+<ul>
+<li>API service availability</li>
+<li>Data file integrity and statistics</li>
+<li>Memory usage and system resources</li>
+<li>Application uptime and version info</li>
+</ul>
+
+<strong>Response Codes:</strong>
+<ul>
+<li>200: System healthy or degraded</li>
+<li>503: System unhealthy (critical failures)</li>
+</ul>
     """,
     responses={
         200: {
@@ -236,11 +248,11 @@ async def health_check():
     Comprehensive health check endpoint.
     
     Returns detailed health information including:
-    - Overall system status
-    - Component health (API, data files, memory)
-    - Data statistics (book count, categories)
-    - System resource monitoring
-    - API version and uptime information
+    • Overall system status
+    • Component health (API, data files, memory)
+    • Data statistics (book count, categories)
+    • System resource monitoring
+    • API version and uptime information
     
     Returns 200 for healthy/degraded status, 503 for unhealthy status.
     """
@@ -277,19 +289,23 @@ async def get_version():
     tags=["Scraping"],
     summary="Start Book Scraping Operation",
     description="""
-    Initiates a book scraping operation to collect data from books.toscrape.com.
-    
-    **Features:**
-    - Asynchronous background processing
-    - Configurable scraping parameters
-    - Progress tracking and status monitoring
-    - Automatic data validation and storage
-    
-    **Process:**
-    1. Validates scraping request parameters
-    2. Starts background scraping task
-    3. Returns operation ID for tracking
-    4. Updates data files upon completion
+Initiates a book scraping operation to collect data from books.toscrape.com.
+
+<strong>Features:</strong>
+<ul>
+<li>Asynchronous background processing</li>
+<li>Configurable scraping parameters</li>
+<li>Progress tracking and status monitoring</li>
+<li>Automatic data validation and storage</li>
+</ul>
+
+<strong>Process:</strong>
+<ol>
+<li>Validates scraping request parameters</li>
+<li>Starts background scraping task</li>
+<li>Returns operation ID for tracking</li>
+<li>Updates data files upon completion</li>
+</ol>
     """,
     responses={
         200: {
@@ -321,18 +337,22 @@ async def start_scraping(
     tags=["Scraping"],
     summary="Get Scraping Operation History",
     description="""
-    Retrieves the execution history of book scraping operations.
-    
-    **Information Provided:**
-    - Operation timestamps and duration
-    - Success/failure status
-    - Number of books scraped
-    - Error messages (if any)
-    - Performance metrics
-    
-    **Filtering:**
-    - Set `include_all=true` to see all operations
-    - Default shows only recent operations
+Retrieves the execution history of book scraping operations.
+
+<strong>Information Provided:</strong>
+<ul>
+<li>Operation timestamps and duration</li>
+<li>Success/failure status</li>
+<li>Number of books scraped</li>
+<li>Error messages (if any)</li>
+<li>Performance metrics</li>
+</ul>
+
+<strong>Filtering:</strong>
+<ul>
+<li>Set 'include_all=true' to see all operations</li>
+<li>Default shows only recent operations</li>
+</ul>
     """,
     responses={
         200: {
@@ -367,14 +387,16 @@ async def get_scraping_history(include_all: bool = False) -> HistoryResponse:
     tags=["Scraping"],
     summary="Get Current Scraping Status",
     description="""
-    Returns the current status of any running scraping operations.
-    
-    **Status Information:**
-    - Operation state (idle, running, completed, failed)
-    - Progress percentage (if running)
-    - Estimated completion time
-    - Current operation details
-    - Last operation summary
+Returns the current status of any running scraping operations.
+
+<strong>Status Information:</strong>
+<ul>
+<li>Operation state (idle, running, completed, failed)</li>
+<li>Progress percentage (if running)</li>
+<li>Estimated completion time</li>
+<li>Current operation details</li>
+<li>Last operation summary</li>
+</ul>
     """,
     responses={
         200: {
@@ -404,23 +426,29 @@ async def get_scraping_status() -> StatusResponse:
     tags=["Categories"],
     summary="List All Book Categories",
     description="""
-    Retrieves all available book categories with optional statistics and sorting.
-    
-    **Features:**
-    - Flexible sorting (by name or book count)
-    - Ascending/descending order
-    - Optional price and rating statistics per category
-    - Book count per category
-    
-    **Sorting Options:**
-    - `name`: Alphabetical by category name
-    - `count`: By number of books in category
-    
-    **Statistics Include:**
-    - Average price per category
-    - Average rating per category 
-    - Price ranges (min/max)
-    - Book counts
+Retrieves all available book categories with optional statistics and sorting.
+
+<strong>Features:</strong>
+<ul>
+<li>Flexible sorting (by name or book count)</li>
+<li>Ascending/descending order</li>
+<li>Optional price and rating statistics per category</li>
+<li>Book count per category</li>
+</ul>
+
+<strong>Sorting Options:</strong>
+<ul>
+<li><code>name</code>: Alphabetical by category name</li>
+<li><code>count</code>: By number of books in category</li>
+</ul>
+
+<strong>Statistics Include:</strong>
+<ul>
+<li>Average price per category</li>
+<li>Average rating per category</li>
+<li>Price ranges (min/max)</li>
+<li>Book counts</li>
+</ul>
     """,
     responses={
         200: {
@@ -461,25 +489,31 @@ async def get_categories(
     tags=["Statistics"],
     summary="Get Detailed Category Statistics",
     description="""
-    Provides comprehensive statistical analysis for book categories.
-    
-    **Analytics Provided:**
-    - Price distribution and quartiles
-    - Rating distribution across 1-5 stars
-    - Availability statistics (in stock vs out of stock)
-    - Book count trends
-    - Category performance metrics
-    
-    **Filtering:**
-    - Filter by specific categories (comma-separated)
-    - Include/exclude rating distribution data
-    - Performance optimized for large datasets
-    
-    **Use Cases:**
-    - Business intelligence and reporting
-    - Category performance analysis
-    - Inventory planning
-    - Price optimization insights
+Provides comprehensive statistical analysis for book categories.
+
+<strong>Analytics Provided:</strong>
+<ul>
+<li>Price distribution and quartiles</li>
+<li>Rating distribution across 1-5 stars</li>
+<li>Availability statistics (in stock vs out of stock)</li>
+<li>Book count trends</li>
+<li>Category performance metrics</li>
+</ul>
+
+<strong>Filtering:</strong>
+<ul>
+<li>Filter by specific categories (comma-separated)</li>
+<li>Include/exclude rating distribution data</li>
+<li>Performance optimized for large datasets</li>
+</ul>
+
+<strong>Use Cases:</strong>
+<ul>
+<li>Business intelligence and reporting</li>
+<li>Category performance analysis</li>
+<li>Inventory planning</li>
+<li>Price optimization insights</li>
+</ul>
     """,
     responses={
         200: {
@@ -529,22 +563,26 @@ async def get_category_statistics(
     tags=["Statistics"],
     summary="Get Comprehensive Overview Statistics",
     description="""
-    Provides high-level overview statistics for the entire book catalog.
-    
-    **Comprehensive Metrics:**
-    - Total books and categories count
-    - Overall price statistics (avg, min, max, median)
-    - Rating distribution across all books
-    - Availability overview (stock status)
-    - Data freshness indicators
-    - Collection growth trends
-    
-    **Perfect For:**
-    - Dashboard displays
-    - Executive reporting
-    - API health monitoring
-    - Data quality assessment
-    - Business performance overview
+Provides high-level overview statistics for the entire book catalog.
+
+<strong>Comprehensive Metrics:</strong>
+<ul>
+<li>Total books and categories count</li>
+<li>Overall price statistics (avg, min, max, median)</li>
+<li>Rating distribution across all books</li>
+<li>Availability overview (stock status)</li>
+<li>Data freshness indicators</li>
+<li>Collection growth trends</li>
+</ul>
+
+<strong>Perfect For:</strong>
+<ul>
+<li>Dashboard displays</li>
+<li>Executive reporting</li>
+<li>API health monitoring</li>
+<li>Data quality assessment</li>
+<li>Business performance overview</li>
+</ul>
     """,
     responses={
         200: {
@@ -589,30 +627,38 @@ async def get_overview_statistics() -> OverviewStatsResponse:
     tags=["Books"],
     summary="List Books with Advanced Filtering",
     description="""
-    Retrieve books with comprehensive filtering, sorting, and pagination capabilities.
-    
-    **Filtering Options:**
-    - **Category**: Filter by book category
-    - **Price Range**: Set minimum and maximum price bounds  
-    - **Rating**: Minimum rating filter (1-5 stars)
-    - **Availability**: Filter by stock status
-    
-    **Sorting Options:**
-    - `title`: Alphabetical by book title
-    - `price`: By price (ascending/descending)
-    - `rating`: By customer rating
-    - `availability`: By stock status
-    - `category`: By category name
-    
-    **Pagination:**
-    - Efficient page-based pagination
-    - Configurable page size (1-100 items)
-    - Total count and pages in response
-    
-    **Performance:**
-    - Optimized for large catalogs
-    - Indexed database queries
-    - Response caching available
+Retrieve books with comprehensive filtering, sorting, and pagination capabilities.
+
+<strong>Filtering Options:</strong>
+<ul>
+<li><strong>Category:</strong> Filter by book category</li>
+<li><strong>Price Range:</strong> Set minimum and maximum price bounds</li>
+<li><strong>Rating:</strong> Minimum rating filter (1-5 stars)</li>
+<li><strong>Availability:</strong> Filter by stock status</li>
+</ul>
+
+<strong>Sorting Options:</strong>
+<ul>
+<li><code>title</code>: Alphabetical by book title</li>
+<li><code>price</code>: By price (ascending/descending)</li>
+<li><code>rating</code>: By customer rating</li>
+<li><code>availability</code>: By stock status</li>
+<li><code>category</code>: By category name</li>
+</ul>
+
+<strong>Pagination:</strong>
+<ul>
+<li>Efficient page-based pagination</li>
+<li>Configurable page size (1-100 items)</li>
+<li>Total count and pages in response</li>
+</ul>
+
+<strong>Performance:</strong>
+<ul>
+<li>Optimized for large catalogs</li>
+<li>Indexed database queries</li>
+<li>Response caching available</li>
+</ul>
     """,
     responses={
         200: {
@@ -681,24 +727,30 @@ async def get_books(
     tags=["Books"],
     summary="Get Top-Rated Books",
     description="""
-    Retrieve the highest-rated books in the catalog.
-    
-    **Features:**
-    - Sorted by rating (5-star first)
-    - Secondary sort by number of reviews
-    - Configurable result count (1-100 books)
-    - Includes rating metadata
-    
-    **Use Cases:**
-    - Featured book recommendations
-    - Homepage highlights
-    - Quality content curation
-    - Customer satisfaction analysis
-    
-    **Response Metadata:**
-    - Number of books returned
-    - Rating range in results
-    - Average rating of returned books
+Retrieve the highest-rated books in the catalog.
+
+<strong>Features:</strong>
+<ul>
+<li>Sorted by rating (5-star first)</li>
+<li>Secondary sort by number of reviews</li>
+<li>Configurable result count (1-100 books)</li>
+<li>Includes rating metadata</li>
+</ul>
+
+<strong>Use Cases:</strong>
+<ul>
+<li>Featured book recommendations</li>
+<li>Homepage highlights</li>
+<li>Quality content curation</li>
+<li>Customer satisfaction analysis</li>
+</ul>
+
+<strong>Response Metadata:</strong>
+<ul>
+<li>Number of books returned</li>
+<li>Rating range in results</li>
+<li>Average rating of returned books</li>
+</ul>
     """,
     responses={
         200: {
@@ -741,26 +793,32 @@ async def get_top_rated_books(
     tags=["Books"],
     summary="Get Books by Price Range",
     description="""
-    Retrieve books within a specific price range with detailed statistics.
-    
-    **Features:**
-    - Inclusive price range filtering
-    - Price distribution analysis
-    - Pagination support
-    - Sorting within price range
-    - Statistical insights
-    
-    **Price Range Analysis:**
-    - Average price in range
-    - Price distribution histogram
-    - Number of books in range
-    - Price quartiles
-    
-    **Perfect For:**
-    - Budget-conscious browsing
-    - Price comparison analysis
-    - Market research
-    - Promotional planning
+Retrieve books within a specific price range with detailed statistics.
+
+<strong>Features:</strong>
+<ul>
+<li>Inclusive price range filtering</li>
+<li>Price distribution analysis</li>
+<li>Pagination support</li>
+<li>Sorting within price range</li>
+<li>Statistical insights</li>
+</ul>
+
+<strong>Price Range Analysis:</strong>
+<ul>
+<li>Average price in range</li>
+<li>Price distribution histogram</li>
+<li>Number of books in range</li>
+<li>Price quartiles</li>
+</ul>
+
+<strong>Perfect For:</strong>
+<ul>
+<li>Budget-conscious browsing</li>
+<li>Price comparison analysis</li>
+<li>Market research</li>
+<li>Promotional planning</li>
+</ul>
     """,
     responses={
         200: {
@@ -817,22 +875,26 @@ async def get_books_by_price_range(
     tags=["Books"],
     summary="Get Book Details by ID",
     description="""
-    Retrieve complete details for a specific book using its unique identifier.
-    
-    **Returned Information:**
-    - Complete book metadata
-    - Pricing information
-    - Customer ratings and reviews
-    - Availability status
-    - Category classification
-    - High-resolution images
-    - Product codes (UPC)
-    - Detailed descriptions
-    
-    **Error Handling:**
-    - Returns 404 if book not found
-    - Validates book ID format
-    - Provides helpful error messages
+Retrieve complete details for a specific book using its unique identifier.
+
+<strong>Returned Information:</strong>
+<ul>
+<li>Complete book metadata</li>
+<li>Pricing information</li>
+<li>Customer ratings and reviews</li>
+<li>Availability status</li>
+<li>Category classification</li>
+<li>High-resolution images</li>
+<li>Product codes (UPC)</li>
+<li>Detailed descriptions</li>
+</ul>
+
+<strong>Error Handling:</strong>
+<ul>
+<li>Returns 404 if book not found</li>
+<li>Validates book ID format</li>
+<li>Provides helpful error messages</li>
+</ul>
     """,
     responses={
         200: {
@@ -877,25 +939,31 @@ async def get_book_by_id(book_id: int):
     tags=["Books"],
     summary="Refresh Book Data Cache", 
     description="""
-    Refresh the book data cache from the CSV file without API downtime.
-    
-    **Operation Details:**
-    - Hot reload of book data
-    - Zero-downtime refresh
-    - Validates data integrity
-    - Updates internal caches
-    - Preserves API availability
-    
-    **When to Use:**
-    - After scraping operations complete
-    - When data files are updated manually
-    - For cache invalidation
-    - During data synchronization
-    
-    **Safety Features:**
-    - Rollback on data validation errors
-    - Atomic cache updates
-    - Error logging and reporting
+Refresh the book data cache from the CSV file without API downtime.
+
+<strong>Operation Details:</strong>
+<ul>
+<li>Hot reload of book data</li>
+<li>Zero-downtime refresh</li>
+<li>Validates data integrity</li>
+<li>Updates internal caches</li>
+<li>Preserves API availability</li>
+</ul>
+
+<strong>When to Use:</strong>
+<ul>
+<li>After scraping operations complete</li>
+<li>When data files are updated manually</li>
+<li>For cache invalidation</li>
+<li>During data synchronization</li>
+</ul>
+
+<strong>Safety Features:</strong>
+<ul>
+<li>Rollback on data validation errors</li>
+<li>Atomic cache updates</li>
+<li>Error logging and reporting</li>
+</ul>
     """,
     responses={
         200: {
@@ -933,29 +1001,37 @@ async def refresh_books_data():
     tags=["Machine Learning"],
     summary="Get ML Feature Vectors",
     description="""
-    Retrieve preprocessed feature vectors ready for machine learning models.
-    
-    **Feature Engineering Pipeline:**
-    - Numerical feature normalization (price, rating)
-    - Categorical encoding (category, availability)
-    - Text feature extraction (title processing)
-    - Missing value imputation
-    - Feature scaling and standardization
-    
-    **Supported Formats:**
-    - Vector format (default): Normalized feature arrays
-    - Metadata included for feature interpretation
-    
-    **Sampling Options:**
-    - Full dataset or random sampling
-    - Shuffling for training data preparation
-    - Configurable sample sizes
-    
-    **Use Cases:**
-    - ML model training preparation
-    - Feature analysis and selection
-    - Data science exploration
-    - Price prediction modeling
+Retrieve preprocessed feature vectors ready for machine learning models.
+
+<strong>Feature Engineering Pipeline:</strong>
+<ul>
+<li>Numerical feature normalization (price, rating)</li>
+<li>Categorical encoding (category, availability)</li>
+<li>Text feature extraction (title processing)</li>
+<li>Missing value imputation</li>
+<li>Feature scaling and standardization</li>
+</ul>
+
+<strong>Supported Formats:</strong>
+<ul>
+<li>Vector format (default): Normalized feature arrays</li>
+<li>Metadata included for feature interpretation</li>
+</ul>
+
+<strong>Sampling Options:</strong>
+<ul>
+<li>Full dataset or random sampling</li>
+<li>Shuffling for training data preparation</li>
+<li>Configurable sample sizes</li>
+</ul>
+
+<strong>Use Cases:</strong>
+<ul>
+<li>ML model training preparation</li>
+<li>Feature analysis and selection</li>
+<li>Data science exploration</li>
+<li>Price prediction modeling</li>
+</ul>
     """,
     responses={
         200: {
@@ -1046,32 +1122,40 @@ async def get_ml_features(
     tags=["Machine Learning"],
     summary="Get ML Training Data",
     description="""
-    Retrieve data ready for machine learning model training with train/test splits.
-    
-    **Data Preparation Pipeline:**
-    - Feature extraction and engineering
-    - Target variable preparation (price prediction)
-    - Train/test splitting with stratification
-    - Data validation and cleaning
-    - Scikit-learn compatible format
-    
-    **Split Configuration:**
-    - Configurable test size (0.0-1.0)
-    - Random state for reproducibility
-    - Stratified sampling when applicable
-    - Balanced class distribution
-    
-    **Output Format:**
-    - X_train, y_train: Training features and targets
-    - X_test, y_test: Testing features and targets  
-    - Feature names in proper order
-    - Split metadata and statistics
-    
-    **ML Framework Compatibility:**
-    - Scikit-learn ready
-    - NumPy array format
-    - Pandas DataFrame compatible
-    - TensorFlow/PyTorch adaptable
+Retrieve data ready for machine learning model training with train/test splits.
+
+<strong>Data Preparation Pipeline:</strong>
+<ul>
+<li>Feature extraction and engineering</li>
+<li>Target variable preparation (price prediction)</li>
+<li>Train/test splitting with stratification</li>
+<li>Data validation and cleaning</li>
+<li>Scikit-learn compatible format</li>
+</ul>
+
+<strong>Split Configuration:</strong>
+<ul>
+<li>Configurable test size (0.0-1.0)</li>
+<li>Random state for reproducibility</li>
+<li>Stratified sampling when applicable</li>
+<li>Balanced class distribution</li>
+</ul>
+
+<strong>Output Format:</strong>
+<ul>
+<li>X_train, y_train: Training features and targets</li>
+<li>X_test, y_test: Testing features and targets</li>
+<li>Feature names in proper order</li>
+<li>Split metadata and statistics</li>
+</ul>
+
+<strong>ML Framework Compatibility:</strong>
+<ul>
+<li>Scikit-learn ready</li>
+<li>NumPy array format</li>
+<li>Pandas DataFrame compatible</li>
+<li>TensorFlow/PyTorch adaptable</li>
+</ul>
     """,
     responses={
         200: {
@@ -1137,36 +1221,44 @@ async def get_training_data(
     tags=["Machine Learning"],
     summary="Make Price Predictions",
     description="""
-    Predict book prices based on book characteristics using ML models.
-    
-    **Prediction Features:**
-    - Title analysis and processing
-    - Category-based pricing models
-    - Rating influence on pricing
-    - Availability impact assessment
-    - Market trend considerations
-    
-    **Model Information:**
-    - Trained on historical book data
-    - Continuous model updates
-    - Cross-validated accuracy
-    - Feature importance analysis
-    - Confidence interval estimation
-    
-    **Input Requirements:**
-    - Book title (string)
-    - Category (must match existing categories)
-    - Rating (1-5 integer scale)
-    - Availability status
-    
-    **Response Details:**
-    - Predicted price in original currency
-    - Confidence intervals (when available)
-    - Feature vector used for prediction
-    - Model version for traceability
-    
-    **Note:** This is currently a demonstration endpoint showing the API structure
-    for ML integration. In production, this would load trained models for real predictions.
+Predict book prices based on book characteristics using ML models.
+
+<strong>Prediction Features:</strong>
+<ul>
+<li>Title analysis and processing</li>
+<li>Category-based pricing models</li>
+<li>Rating influence on pricing</li>
+<li>Availability impact assessment</li>
+<li>Market trend considerations</li>
+</ul>
+
+<strong>Model Information:</strong>
+<ul>
+<li>Trained on historical book data</li>
+<li>Continuous model updates</li>
+<li>Cross-validated accuracy</li>
+<li>Feature importance analysis</li>
+<li>Confidence interval estimation</li>
+</ul>
+
+<strong>Input Requirements:</strong>
+<ul>
+<li>Book title (string)</li>
+<li>Category (must match existing categories)</li>
+<li>Rating (1-5 integer scale)</li>
+<li>Availability status</li>
+</ul>
+
+<strong>Response Details:</strong>
+<ul>
+<li>Predicted price in original currency</li>
+<li>Confidence intervals (when available)</li>
+<li>Feature vector used for prediction</li>
+<li>Model version for traceability</li>
+</ul>
+
+<strong>Note:</strong> This is currently a demonstration endpoint showing the API structure
+for ML integration. In production, this would load trained models for real predictions.
     """,
     responses={
         200: {
