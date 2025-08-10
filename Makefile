@@ -1,4 +1,4 @@
-.PHONY: help venv install test run clean lint commit
+.PHONY: help venv install test run clean lint commit bump activate
 
 help:
 	@echo "Available commands:"
@@ -9,6 +9,7 @@ help:
 	@echo "  clean      - Clean cache files"
 	@echo "  commit     - Create a conventional commit using commitizen"
 	@echo "  bump       - Bump version using commitizen"
+	@echo "  activate   - Show command to activate virtual environment"
 
 venv:
 	python3 -m venv venv
@@ -19,7 +20,7 @@ install: venv
 	venv/bin/pip install -r requirements.txt
 
 test:
-	venv/bin/pytest
+	venv/bin/pytest -v
 
 run:
 	venv/bin/python run.py
@@ -35,3 +36,6 @@ commit:
 
 bump:
 	venv/bin/cz bump
+
+activate:
+	source venv/bin/activate

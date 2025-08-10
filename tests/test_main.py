@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+from app import app
 
 client = TestClient(app)
 
@@ -14,10 +14,24 @@ def test_root_endpoint():
 
 
 def test_health_check_endpoint():
-    """Test the health check endpoint returns healthy status."""
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "healthy"}
+    """Test the enhanced health check endpoint returns comprehensive health status."""
+    response = client.get("/api/v1/health")
+    assert response.status_code in [200, 503]  # Either healthy or unhealthy
+    
+    data = response.json()
+    
+    # Check required fields in response
+    assert "status" in data
+    assert "version" in data
+    assert "timestamp" in data
+    assert "uptime" in data
+    assert "components" in data
+    assert "data" in data
+    assert "system" in data
+    assert "api_info" in data
+    
+    # Status should be one of the valid values
+    assert data["status"] in ["healthy", "degraded", "unhealthy"]
 
 
 def test_version_endpoint():
@@ -34,5 +48,5 @@ async def test_endpoints_content_type():
     response = client.get("/")
     assert response.headers["content-type"] == "application/json"
 
-    response = client.get("/health")
+    response = client.get("/api/v1/health")
     assert response.headers["content-type"] == "application/json"

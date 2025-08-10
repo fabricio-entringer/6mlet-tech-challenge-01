@@ -1,4 +1,4 @@
-"""Application package."""
+"""API package for the application."""
 
 from .main import app
 
