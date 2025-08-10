@@ -1,0 +1,25 @@
+# Ignore environment files with sensitive data
+.env
+.env.local
+.env.development
+.env.production
+
+# Ignore Docker build context files
+.dockerignore
+
+# Ignore temporary Docker files
+docker-compose.override.yml
+
+# Ignore logs and data directories when mounted
+data/
+logs/
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS specific files
+.DS_Store
+Thumbs.db

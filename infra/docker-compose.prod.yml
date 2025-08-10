@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: production
+    container_name: 6mlet-api-prod
+    ports:
+      - "8080:8000"
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=warning
+      - DATA_PATH=/app/data
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - WORKERS=4
+    volumes:
+      # Mount data directory for persistence (read-only in production)
+      - data_volume:/app/data:ro
+      # Mount logs directory for persistence
+      - logs_volume:/app/logs
+    networks:
+      - 6mlet-network
+    restart: always
+    depends_on:
+      - data-init
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+  # Service to initialize data from source
+  data-init:
+    image: alpine:latest
+    container_name: 6mlet-data-init-prod
+    volumes:
+      - ../data:/source:ro
+      - data_volume:/target
+    command: >
+      sh -c "
+        if [ ! -f /target/books_data.csv ]; then
+          cp -r /source/* /target/
+          echo 'Data files copied to persistent volume'
+        else
+          echo 'Data files already exist in volume'
+        fi
+      "
+    networks:
+      - 6mlet-network
+
+volumes:
+  # Persistent volume for CSV data storage
+  data_volume:
+    driver: local
+    name: 6mlet-data-prod
+  
+  # Persistent volume for application logs
+  logs_volume:
+    driver: local
+    name: 6mlet-logs-prod
+
+networks:
+  6mlet-network:
+    driver: bridge
+    name: 6mlet-network-prod
