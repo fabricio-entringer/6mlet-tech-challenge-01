@@ -68,31 +68,100 @@ bump:
 # Docker commands
 docker-build:
 	@echo "Building Docker image..."
-	cd infra && ./docker-manage.sh build
+	@if ! docker info >/dev/null 2>&1; then \
+		echo "❌ Docker is not running. Please start Docker and try again."; \
+		exit 1; \
+	fi
+	cd infra && docker build -t 6mlet-tech-challenge-01:latest -f Dockerfile ..
+	@echo "✅ Docker image built successfully!"
 
 docker-run:
 	@echo "Running Docker image..."
-	cd infra && ./docker-manage.sh run
+	@if ! docker info >/dev/null 2>&1; then \
+		echo "❌ Docker is not running. Please start Docker and try again."; \
+		exit 1; \
+	fi
+	@if ! docker image inspect 6mlet-tech-challenge-01:latest >/dev/null 2>&1; then \
+		echo "⚠️ Image not found. Building image first..."; \
+		$(MAKE) docker-build; \
+	fi
+	@echo "Stopping any existing container..."
+	-docker stop 6mlet-api 2>/dev/null
+	-docker rm 6mlet-api 2>/dev/null
+	@echo "Starting container on port 8000..."
+	cd infra && docker run -d --rm -p 8000:8000 \
+		--name 6mlet-api \
+		-v $$(pwd)/../data:/app/data:ro \
+		-v 6mlet-logs:/app/logs \
+		-e ENVIRONMENT=production \
+		-e LOG_LEVEL=info \
+		6mlet-tech-challenge-01:latest
+	@echo "✅ Container started successfully!"
+	@echo "🌐 API available at: http://localhost:8000"
+	@echo "🏥 Health check: http://localhost:8000/health"
+	@echo "📚 API docs: http://localhost:8000/docs"
+	@echo "ℹ️ Container is running in background. Use 'make docker-stop' to stop it."
 
 docker-setup:
 	@echo "Setting up Docker environment..."
-	cd infra && ./docker-manage.sh setup
+	@if ! docker info >/dev/null 2>&1; then \
+		echo "❌ Docker is not running. Please start Docker and try again."; \
+		exit 1; \
+	fi
+	@if ! command -v docker-compose >/dev/null 2>&1; then \
+		echo "❌ docker-compose is not installed. Please install it and try again."; \
+		exit 1; \
+	fi
+	cd infra && if [ ! -f .env ]; then \
+		cp .env.example .env; \
+		echo "✅ Created .env file from template"; \
+		echo "⚠️ Please review and modify .env file as needed"; \
+	fi
+	cd infra && docker-compose up --build -d
+	@echo "✅ Docker environment started!"
+	@echo "🌐 API available at: http://localhost:8000"
+	@echo "🏥 Health check: http://localhost:8000/health"
+	@echo "📚 API docs: http://localhost:8000/docs"
 
 docker-stop:
 	@echo "Stopping Docker containers..."
-	cd infra && ./docker-manage.sh stop
+	@if docker ps -q --filter "name=6mlet-api" | grep -q .; then \
+		docker stop 6mlet-api; \
+		echo "✅ Stopped direct container"; \
+	fi
+	@if docker-compose -f infra/docker-compose.yml ps -q >/dev/null 2>&1; then \
+		cd infra && docker-compose down; \
+		echo "✅ Stopped compose environment"; \
+	fi
 
 docker-cleanup:
 	@echo "Cleaning up Docker resources..."
-	cd infra && ./docker-manage.sh cleanup
+	$(MAKE) docker-stop
+	@echo "Removing volumes..."
+	-docker volume rm 6mlet-data 6mlet-logs 2>/dev/null
+	@echo "Removing networks..."
+	-docker network rm 6mlet-network 2>/dev/null
+	@echo "Pruning unused images..."
+	docker image prune -f
+	@echo "✅ Cleanup completed!"
 
 docker-logs:
 	@echo "Showing Docker logs..."
-	cd infra && ./docker-manage.sh logs
+	@if docker ps -q --filter "name=6mlet-api" | grep -q .; then \
+		docker logs -f 6mlet-api; \
+	elif docker-compose -f infra/docker-compose.yml ps -q >/dev/null 2>&1; then \
+		cd infra && docker-compose logs -f api; \
+	else \
+		echo "❌ No running containers found"; \
+	fi
 
 docker-test:
 	@echo "Running Docker environment tests..."
-	cd infra && docker-compose exec api python -m pytest
+	@if docker-compose -f infra/docker-compose.yml ps -q >/dev/null 2>&1; then \
+		cd infra && docker-compose exec api python -m pytest; \
+	else \
+		echo "❌ Docker compose environment not running. Start it first with 'make docker-setup'"; \
+	fi
 
 docker-validate:
 	@echo "Validating Docker setup..."
