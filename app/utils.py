@@ -1,6 +1,14 @@
 import os
-import tomllib
 from typing import Optional
+
+try:
+    import tomllib
+except ImportError:
+    # Fallback for Python < 3.11
+    try:
+        import tomli as tomllib
+    except ImportError:
+        tomllib = None
 
 
 def convert_price_to_float(price_str: str) -> Optional[float]:
@@ -95,6 +103,10 @@ def convert_rating_to_float(
 
 def get_version() -> str:
     """Get version from pyproject.toml file."""
+    if tomllib is None:
+        # Return fallback version if tomllib is not available
+        return "0.1.0"
+    
     try:
         # Get the project root directory (parent of app directory)
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -104,6 +116,6 @@ def get_version() -> str:
         with open(pyproject_path, "rb") as f:
             pyproject_data = tomllib.load(f)
             return pyproject_data.get("project", {}).get("version", "0.1.0")
-    except (FileNotFoundError, KeyError, tomllib.TOMLDecodeError):
+    except (FileNotFoundError, KeyError, Exception):
         # Fallback version if file is not found or version is not in file
         return "0.1.0"

@@ -1,12 +1,11 @@
+# =================
+# Python
+# =================
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Virtual environment
-venv/
-env/
-ENV/
 
 # C extensions
 *.so
@@ -73,16 +72,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Web scraper output and logs
-logs/*.log
-logs/*.txt
-data/*.csv
-data/*.json
-data/*.xlsx
-data/*
-!data/.gitkeep
-!data/sample_books_data.csv
-
 # Sphinx documentation
 docs/_build/
 
@@ -142,15 +131,6 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -175,31 +155,102 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# PyCharm
+# Ruff stuff:
+.ruff_cache/
+
+# PyPI configuration file
+.pypirc
+
+# =================
+# Virtual Environments
+# =================
+
+# Virtual environment
+venv/
+env/
+ENV/
+.env
+.venv
+env.bak/
+venv.bak/
+
+# =================
+# Machine Learning (from app/ml/)
+# =================
+
+# Trained models
+*.pkl
+
+# =================
+# Project Specific
+# =================
+
+# Web scraper output and logs
+logs/*.log
+logs/*.txt
+data/*.csv
+data/*.json
+data/*.xlsx
+data/*
+!data/.gitkeep
+!data/sample_books_data.csv
+
+# =================
+# Docker & Infrastructure
+# =================
+
+# Environment files with sensitive data (from infra/)
+.env.local
+.env.development
+.env.production
+
+# Docker build context files
+.dockerignore
+
+# Temporary Docker files
+docker-compose.override.yml
+
+# Docker logs and data directories when mounted
+logs/
+# Note: data/ already covered above in project specific section
+
+# =================
+# IDEs and Editors
+# =================
+
+# Visual Studio Code
+.vscode/
+
+# PyCharm & JetBrains IDEs
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+.idea/
+
+# Vim/Neovim
+*.swp
+*.swo
+
+# =================
+# Operating System
+# =================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# =================
+# AI Development Tools
+# =================
 
 # Abstra
 # Abstra is an AI-powered process automation framework.
 # Ignore directories containing user credentials, local state, and settings.
 # Learn more at https://abstra.io/docs
 .abstra/
-
-# Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
-#  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
-#  you could uncomment the following to ignore the enitre vscode folder
-# .vscode/
-
-# Ruff stuff:
-.ruff_cache/
-
-# PyPI configuration file
-.pypirc
 
 # Cursor
 #  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
@@ -217,6 +268,3 @@ cython_debug/
 .copilotrc.*
 COPILOT.md
 copilot-instructions.*
-
-# VS Code workspace settings (local development only)
-.vscode/
