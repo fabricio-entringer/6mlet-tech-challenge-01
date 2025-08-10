@@ -871,6 +871,79 @@ async def get_books_by_price_range(
 
 
 @app.get(
+    "/api/v1/books/search",
+    response_model=BooksResponse,
+    tags=["Books"],
+    summary="Search Books by Title and/or Category",
+    description="""
+Search books using title and/or category filters as specified in the Tech Challenge requirements.
+
+<strong>Search Parameters:</strong>
+<ul>
+<li><strong>title</strong>: Search books by title (case-insensitive partial match)</li>
+<li><strong>category</strong>: Filter books by category (case-insensitive exact match)</li>
+</ul>
+
+<strong>Search Behavior:</strong>
+<ul>
+<li>Both parameters are optional - can use title only, category only, or both</li>
+<li>Title search uses partial matching (contains search)</li>
+<li>Category search uses exact matching</li>
+<li>Results include pagination and sorting</li>
+</ul>
+
+<strong>Use Cases:</strong>
+<ul>
+<li>Search for specific books by title</li>
+<li>Browse books within a specific category</li>
+<li>Find books matching both title and category criteria</li>
+</ul>
+    """,
+    responses={
+        200: {
+            "description": "Books search completed successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "data": [
+                            {
+                                "id": 1,
+                                "title": "Harry Potter and the Philosopher's Stone",
+                                "price": 25.99,
+                                "category": "Fiction"
+                            }
+                        ],
+                        "pagination": {
+                            "page": 1,
+                            "limit": 20,
+                            "total": 5,
+                            "pages": 1
+                        },
+                        "filters_applied": {
+                            "title": "Harry",
+                            "category": "Fiction"
+                        }
+                    }
+                }
+            }
+        },
+        400: {"description": "Invalid search parameters"},
+        422: {"description": "Validation error in search parameters"}
+    }
+)
+async def search_books(
+    title: Optional[str] = Query(None, description="Search books by title (partial match)"),
+    category: Optional[str] = Query(None, description="Filter books by category (exact match)"),
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    limit: int = Query(20, ge=1, le=100, description="Number of items per page"),
+    sort: str = Query("title", pattern="^(title|price|rating|availability|category)$", description="Sort field"),
+    order: str = Query("asc", pattern="^(asc|desc)$", description="Sort order"),
+) -> BooksResponse:
+    """Search books by title and/or category as specified in Tech Challenge requirements."""
+    return await books.search_books(title, category, page, limit, sort, order)
+
+
+@app.get(
     "/api/v1/books/{book_id}",
     tags=["Books"],
     summary="Get Book Details by ID",

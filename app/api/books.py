@@ -637,6 +637,80 @@ async def get_books_by_price_range(
         )
 
 
+async def search_books(
+    title: Optional[str] = None,
+    category: Optional[str] = None,
+    page: int = 1,
+    limit: int = 20,
+    sort: str = "title",
+    order: str = "asc",
+) -> BooksResponse:
+    """
+    Search books by title and/or category as required by Tech Challenge.
+
+    This endpoint implements the mandatory /api/v1/books/search functionality
+    that allows searching books using title and category filters with pagination.
+
+    **Query Parameters:**
+    - **title**: Search books by title (case-insensitive partial match, optional)
+    - **category**: Filter books by category (case-insensitive exact match, optional)
+    - **page**: Page number (starts from 1)
+    - **limit**: Number of books per page (1-100)
+    - **sort**: Sort field (title, price, rating, availability, category)
+    - **order**: Sort order (asc, desc)
+
+    **Search Behavior:**
+    - Both title and category parameters are optional
+    - If only category is provided, returns all books in that category
+    - If only title is provided, searches across all books
+    - If both are provided, returns books matching both criteria
+    - Title search uses partial matching (contains search)
+
+    **Response includes:**
+    - **data**: Array of book objects matching search criteria
+    - **pagination**: Standard pagination metadata (page, limit, total, pages)
+    - **filters_applied**: Summary of applied search filters
+
+    **Error Responses:**
+    - **500**: Internal server error during search operation
+    """
+    try:
+        # Se não tem título, usa função existente
+        if title is None:
+            return await get_books(page=page, limit=limit, category=category, sort=sort, order=order)
+        
+        # Busca com título
+        service = get_books_data_service()
+        books = service.data_service.cache.search_books(category=category)
+        
+        # Filtra por título
+        if title:
+            books = [book for book in books if title.lower() in book.title.lower()]
+        
+        # Ordena
+        books = service._apply_sorting(books, sort, order)
+        
+        # Paginação
+        total = len(books)
+        start = (page - 1) * limit
+        end = start + limit
+        books = books[start:end]
+        
+        # Resposta
+        pagination = PaginationInfo(page=page, limit=limit, total=total, pages=(total + limit - 1) // limit)
+        
+        filters = {}
+        if title:
+            filters["title"] = title
+        if category:
+            filters["category"] = category
+            
+        return BooksResponse(data=books, pagination=pagination, filters_applied=filters)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro: {str(e)}")
+
+
 async def refresh_books_data() -> Dict[str, str]:
     """
     Refresh book data cache from CSV file without API downtime.
