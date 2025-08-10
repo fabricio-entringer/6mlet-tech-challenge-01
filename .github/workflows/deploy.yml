@@ -1,34 +1,30 @@
-name: Deploy to Railway
+name: Deploy to Render
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
     branches:
-      - master  # Deploy when pushing to master branch.
+      - master
 
 jobs:
-  deploy:
+  deploy-to-render:
     runs-on: ubuntu-latest
+    # Only run this job if the previous workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Build package
+      - name: Deploy to Render
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install build
-          python -m build
+          echo "Triggering Render deployment..."
+          curl -X POST "${{ secrets.RENDER_DEPLOY_WEBHOOK }}"
+          echo "Deployment webhook triggered successfully!"
 
-      - name: Install Railway CLI
+      - name: Verify deployment trigger
         run: |
-          curl -fsSL https://railway.app/install.sh | sh
-          echo "$HOME/.railway/bin" >> $GITHUB_PATH
-
-      - name: Deploy to Railway
-        run: railway up -- --project cad4673f-bd18-41ee-88c9-d61b74f9f705
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          echo "Deployment has been triggered on Render.com"
+          echo "Check your Render dashboard for deployment status"
