@@ -126,7 +126,7 @@ class HealthService:
                 return (
                     ComponentHealth(
                         status="unhealthy",
-                        details="Data file not found",
+                        details="Data file not found. You must start the scraping service in the endpoint /scraping/start to create it.",
                         last_checked=now
                     ),
                     DataStats(

@@ -3,6 +3,7 @@
 from typing import Optional
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 from ..models import (
     BookResponse,
@@ -156,6 +157,14 @@ app = FastAPI(
             "description": "Production server"
         }
     ]
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for now to be possible testing with swagger
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
