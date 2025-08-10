@@ -1,7 +1,7 @@
 """Pydantic models for ML endpoints - Desafio 2."""
 
 from typing import Dict, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class FeatureVector(BaseModel):
@@ -59,20 +59,65 @@ class TrainingDataResponse(BaseModel):
 
 
 class PredictionRequest(BaseModel):
-    """Request model for prediction endpoint."""
+    """
+    Request model for price prediction endpoint.
     
-    title: str = Field(..., description="Book title")
-    category: str = Field(..., description="Book category")
-    rating: int = Field(..., ge=1, le=5, description="Book rating (1-5)")
-    availability: str = Field(..., description="Book availability status")
+    Provide book characteristics to get ML-based price predictions.
+    All fields are required for accurate predictions.
+    """
+    
+    title: str = Field(..., description="Book title for analysis and feature extraction")
+    category: str = Field(..., description="Book category (must match existing categories)")
+    rating: int = Field(..., ge=1, le=5, description="Book rating on 1-5 scale")
+    availability: str = Field(..., description="Book availability status (e.g., 'In stock', 'Out of stock')")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "title": "The Great Adventure",
+                "category": "Fiction",
+                "rating": 4,
+                "availability": "In stock"
+            }
+        }
+    )
 
 
 class PredictionResponse(BaseModel):
-    """Response model for prediction endpoint."""
+    """
+    Response model for price prediction endpoint.
     
-    predicted_price: float = Field(..., description="Predicted price in original currency")
-    confidence_interval: Optional[Dict[str, float]] = Field(None, description="Confidence interval if available")
-    feature_vector: Dict[str, float] = Field(..., description="Generated feature vector")
-    model_version: str = Field(..., description="Version of the model used")
+    Contains the predicted price along with confidence metrics and
+    the feature vector used for the prediction.
+    """
     
-    model_config = {"protected_namespaces": ()}
+    predicted_price: float = Field(..., description="Predicted price in original currency (GBP)")
+    confidence_interval: Optional[Dict[str, float]] = Field(
+        None, 
+        description="Confidence interval bounds if available"
+    )
+    feature_vector: Dict[str, float] = Field(
+        ..., 
+        description="Generated feature vector used for prediction"
+    )
+    model_version: str = Field(..., description="Version of the model used for prediction")
+    
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra={
+            "example": {
+                "predicted_price": 24.99,
+                "confidence_interval": {
+                    "lower": 22.50,
+                    "upper": 27.48
+                },
+                "feature_vector": {
+                    "title_length_norm": 0.6,
+                    "category_fiction": 1.0,
+                    "rating_norm": 0.8,
+                    "availability_in_stock": 1.0
+                },
+                "model_version": "v1.0.0-demo"
+            }
+        }
+    )
