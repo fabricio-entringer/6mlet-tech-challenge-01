@@ -440,3 +440,143 @@ When creating an issue, please:
 - beautifulsoup4 4.12.3+
 - lxml 5.2.2+
 - pandas 2.2.2+
+
+## Architecture Plan
+
+### 📊 Pipeline Overview
+
+```
+[Website] → [Scraper] → [CSV] → [API] → [Users]
+                           ↓
+                      [ML Features]
+```
+
+**Data Flow**:
+1. **Collection**: Python script scrapes books.toscrape.com
+2. **Storage**: Data saved in CSV file format
+3. **API**: FastAPI reads CSV and serves data via REST endpoints
+4. **ML Ready**: Preprocessed features available for data scientists
+
+### 🎯 Data Science Use Case
+
+**Scenario**: A junior data scientist needs to build a book price prediction model.
+
+**Workflow using our API**:
+
+1. **Data Exploration**:
+   ```python
+   # Check available books
+   GET /api/v1/books
+   
+   # Explore categories  
+   GET /api/v1/categories
+   
+   # Get statistics
+   GET /api/v1/stats/overview
+   ```
+
+2. **Model Training**:
+   ```python
+   # Get preprocessed training data
+   GET /api/v1/ml/training-data
+   
+   # Returns X_train, y_train, X_test, y_test
+   # Ready for sklearn models
+   ```
+
+3. **Model Testing**:
+   ```python
+   # Test predictions
+   POST /api/v1/ml/predictions
+   {
+     "title": "Python for Data Science",
+     "category": "Technology",
+     "rating": 5,
+     "availability": "In stock"
+   }
+   ```
+
+### 🔧 ML Integration Plan
+
+#### Current Features:
+- ✅ Clean, structured data from 1000+ books
+- ✅ Preprocessed features (normalized prices, one-hot encoded categories)
+- ✅ Ready-to-use training/test splits
+- ✅ Mock prediction endpoint for testing
+
+#### Integration Example:
+
+```python
+import requests
+from sklearn.ensemble import RandomForestRegressor
+
+# 1. Data scientist fetches training data
+response = requests.get("https://api.example.com/api/v1/ml/training-data")
+data = response.json()
+
+# 2. Train model locally
+model = RandomForestRegressor()
+model.fit(data["X_train"], data["y_train"])
+
+# 3. Evaluate on test set
+score = model.score(data["X_test"], data["y_test"])
+
+# 4. Test with API predictions
+prediction = requests.post("https://api.example.com/api/v1/ml/predictions", 
+    json={"title": "New Book", "category": "Fiction", "rating": 4})
+```
+
+### 🏗️ System Architecture
+
+```
+┌─────────────────┐
+│   Railway.app   │  ← Cloud deployment
+└────────┬────────┘
+         │
+┌────────▼────────┐
+│    FastAPI      │  ← REST API
+├─────────────────┤
+│   Endpoints:    │
+│   - /books      │
+│   - /categories │
+│   - /search     │
+│   - /ml/*       │
+└────────┬────────┘
+         │
+┌────────▼────────┐
+│   books.csv     │  ← Data storage
+└─────────────────┘
+```
+
+### 💡 Practical Use Cases
+
+**For ML Students and Beginners**:
+
+1. **Price Analysis**: 
+   - Which categories have higher prices?
+   - Does rating correlate with price?
+   - Availability impact on pricing
+
+2. **Simple Prediction Models**:
+   - Linear regression for price prediction
+   - Decision trees for category classification
+   - Feature importance analysis
+
+3. **Data Science Exercises**:
+   - Exploratory data analysis using API data
+   - Create visualizations (price distributions, rating analysis)
+   - Build and compare different ML models
+   - Practice feature engineering
+
+### 📈 Future Enhancements
+
+Simple improvements for learning:
+- Add more books through periodic scraping
+- Implement model persistence
+- Add database support (PostgreSQL)
+- Create model comparison endpoints
+- Add real-time predictions
+
+---
+
+**Summary**: This API serves as an educational tool providing real-world data for students to practice machine learning with a production-ready REST API! 🎓
