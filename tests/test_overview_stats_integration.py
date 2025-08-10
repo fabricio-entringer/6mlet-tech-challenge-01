@@ -69,7 +69,7 @@ class TestOverviewStatsIntegration:
 
     def test_overview_stats_endpoint_openapi_spec(self):
         """Test that the endpoint is properly documented in OpenAPI spec."""
-        response = client.get("/openapi.json")
+        response = client.get("/api/v1/openapi.json")
         assert response.status_code == 200
         
         openapi_spec = response.json()

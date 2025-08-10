@@ -269,7 +269,7 @@ class TestHealthEndpointIntegration:
 
     def test_health_endpoint_openapi_documentation(self):
         """Test that the health endpoint is documented in OpenAPI spec."""
-        response = client.get("/openapi.json")
+        response = client.get("/api/v1/openapi.json")
         assert response.status_code == 200
         
         openapi_spec = response.json()
