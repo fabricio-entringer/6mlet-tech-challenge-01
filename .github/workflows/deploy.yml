@@ -28,11 +28,6 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: Authenticate Railway CLI
-        run: railway login --ci
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
       - name: Link project
         run: railway link cad4673f-bd18-41ee-88c9-d61b74f9f705
 
