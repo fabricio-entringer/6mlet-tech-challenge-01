@@ -1,9 +1,0 @@
-# Trained models
-*.pkl
-
-# Python cache
-__pycache__/
-*.pyc
-
-# Test files
-test_*.py
