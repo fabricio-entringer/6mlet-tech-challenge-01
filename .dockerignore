@@ -1,0 +1,86 @@
+# Docker Build Ignore
+# This file specifies which files and directories should be excluded from the Docker build context
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+assets/
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Testing
+.tox/
+.coverage
+.pytest_cache/
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+
+# Docker
+docker-compose.override.yml
+
+# Infra directory (avoid recursive copying)
+infra/
+
+# Large datasets (will be mounted as volumes)
+data/books_data.csv
