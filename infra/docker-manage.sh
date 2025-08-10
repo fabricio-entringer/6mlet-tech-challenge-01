@@ -45,6 +45,47 @@ check_compose() {
     fi
 }
 
+# Function to build Docker image
+build_image() {
+    print_status "Building Docker image..."
+    
+    docker build -t 6mlet-tech-challenge-01:latest -f Dockerfile ..
+    
+    print_success "Docker image built successfully!"
+    print_status "Image: 6mlet-tech-challenge-01:latest"
+}
+
+# Function to run Docker image directly
+run_image() {
+    print_status "Running Docker image directly..."
+    
+    # Check if image exists
+    if ! docker image inspect 6mlet-tech-challenge-01:latest >/dev/null 2>&1; then
+        print_warning "Image not found. Building image first..."
+        build_image
+    fi
+    
+    # Stop any existing container with the same name
+    docker stop 6mlet-api 2>/dev/null || true
+    docker rm 6mlet-api 2>/dev/null || true
+    
+    # Run the container
+    print_status "Starting container on port 8000..."
+    docker run --rm -p 8000:8000 \
+        --name 6mlet-api \
+        -v $(pwd)/../data:/app/data:ro \
+        -v 6mlet-logs:/app/logs \
+        -e ENVIRONMENT=production \
+        -e LOG_LEVEL=info \
+        6mlet-tech-challenge-01:latest &
+    
+    print_success "Container started successfully!"
+    print_status "API available at: http://localhost:8000"
+    print_status "Health check: http://localhost:8000/health"
+    print_status "API docs: http://localhost:8000/docs"
+    print_warning "Container is running in the background. Use 'docker stop 6mlet-api' to stop it."
+}
+
 # Function to setup environment
 setup() {
     print_status "Setting up Docker environment..."
@@ -162,7 +203,9 @@ show_help() {
     echo "Usage: $0 [COMMAND] [OPTIONS]"
     echo ""
     echo "Commands:"
-    echo "  setup                     Setup Docker environment"
+    echo "  build                     Build Docker image"
+    echo "  run                       Run Docker image directly (without compose)"
+    echo "  setup                     Setup Docker environment with compose"
     echo "  stop                      Stop all containers"
     echo "  cleanup                   Clean up all Docker resources"
     echo "  logs [service]            Show logs (default: api)"
@@ -171,7 +214,9 @@ show_help() {
     echo "  help                      Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0 setup                 # Start Docker environment"
+    echo "  $0 build                 # Build Docker image"
+    echo "  $0 run                   # Run image directly"
+    echo "  $0 setup                 # Start with Docker Compose"
     echo "  $0 logs api              # Show API logs"
     echo "  $0 restore backup.tar.gz # Restore data"
     echo ""
@@ -188,6 +233,12 @@ main() {
     
     # Parse command
     case "$1" in
+        build)
+            build_image
+            ;;
+        run)
+            run_image
+            ;;
         setup|setup-dev|setup-prod)
             setup
             ;;
