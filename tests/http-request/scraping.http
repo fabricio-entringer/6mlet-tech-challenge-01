@@ -1,0 +1,24 @@
+### Scraping API Endpoints
+
+### Start Scraping Operation (Basic Request)
+POST {{baseUrl}}/scraping/start
+Accept: {{contentType}}
+Content-Type: {{contentType}}
+
+{
+  "delay": 0,
+  "max_retries": 3,
+  "timeout": 30
+}
+
+### Get Scraping History (Recent Operations Only)
+GET {{baseUrl}}/scraping/history
+Accept: {{contentType}}
+
+### Get Scraping History (All Operations)
+GET {{baseUrl}}/scraping/history?include_all=true
+Accept: {{contentType}}
+
+### Get Current Scraping Status
+GET {{baseUrl}}/scraping/status
+Accept: {{contentType}}

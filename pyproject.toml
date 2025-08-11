@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "6mlet-tech-challenge-01"
 description = "FastAPI application for 6MLET Tech Challenge 01"
-version = "0.0.1"
+version = "0.1.1"
 authors = [
     {name = "Fabricio Entringer", email = "fabricio@entringer.dev"},
     {name = "Adriano Ribeiro", email = "aribeiro@gmail.com"}
@@ -40,6 +40,7 @@ version_scheme = "semver"
 version_provider = "commitizen"
 update_changelog_on_bump = true
 major_version_zero = true
+version = "0.1.1"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

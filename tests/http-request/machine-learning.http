@@ -1,0 +1,61 @@
+### Machine Learning API Endpoints
+
+### Get ML Feature Vectors (All Data)
+GET {{baseUrl}}/api/v1/ml/features
+Accept: {{contentType}}
+
+### Get ML Feature Vectors (Sampled and Shuffled)
+GET {{baseUrl}}/api/v1/ml/features?format=vector&include_metadata=true&sample_size=100&shuffle=true
+Accept: {{contentType}}
+
+### Get ML Feature Vectors (Without Metadata)
+GET {{baseUrl}}/api/v1/ml/features?format=vector&include_metadata=false&sample_size=50&shuffle=false
+Accept: {{contentType}}
+
+### Get ML Training Data (Default Split)
+GET {{baseUrl}}/api/v1/ml/training-data
+Accept: {{contentType}}
+
+### Get ML Training Data (Custom Split)
+GET {{baseUrl}}/api/v1/ml/training-data?test_size=0.3&random_state=123
+Accept: {{contentType}}
+
+### Get ML Training Data (Small Test Split)
+GET {{baseUrl}}/api/v1/ml/training-data?test_size=0.1&random_state=42
+Accept: {{contentType}}
+
+### Make Price Prediction (Fiction Book)
+POST {{baseUrl}}/api/v1/ml/predictions
+Accept: {{contentType}}
+Content-Type: {{contentType}}
+
+{
+  "title": "The Great Adventure",
+  "category": "Fiction",
+  "rating": 4,
+  "availability": "In stock"
+}
+
+### Make Price Prediction (Poetry Book)
+POST {{baseUrl}}/api/v1/ml/predictions
+Accept: {{contentType}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Verses of the Heart",
+  "category": "Poetry",
+  "rating": 5,
+  "availability": "In stock"
+}
+
+### Make Price Prediction (Mystery Book - Out of Stock)
+POST {{baseUrl}}/api/v1/ml/predictions
+Accept: {{contentType}}
+Content-Type: {{contentType}}
+
+{
+  "title": "The Hidden Secret",
+  "category": "Mystery",
+  "rating": 3,
+  "availability": "Out of stock"
+}
