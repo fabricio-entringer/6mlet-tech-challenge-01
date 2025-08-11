@@ -5,7 +5,7 @@ name: Branch Protection
 
 on:
   pull_request:
-    branches: ['*']
+    branches: ['master']
 
 jobs:
   check-source-branch:
