@@ -1,9 +1,27 @@
 import pytest
+import re
+from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app import app
 
 client = TestClient(app)
+
+
+def get_project_version():
+    """Get the version from pyproject.toml."""
+    project_root = Path(__file__).parent.parent
+    pyproject_path = project_root / "pyproject.toml"
+    
+    with open(pyproject_path, "r") as f:
+        content = f.read()
+    
+    # Find version in the [project] section
+    version_match = re.search(r'version\s*=\s*["\']([^"\']+)["\']', content)
+    if version_match:
+        return version_match.group(1)
+    
+    raise ValueError("Could not find version in pyproject.toml")
 
 
 def test_root_endpoint():
@@ -35,11 +53,14 @@ def test_health_check_endpoint():
 
 
 def test_version_endpoint():
-    """Test the version endpoint returns current version."""
+    """Test the version endpoint returns current version from pyproject.toml."""
     response = client.get("/version")
     assert response.status_code == 200
     assert "version" in response.json()
-    assert response.json()["version"] == "0.0.1"
+    
+    # Get expected version from pyproject.toml
+    expected_version = get_project_version()
+    assert response.json()["version"] == expected_version
 
 
 @pytest.mark.asyncio
