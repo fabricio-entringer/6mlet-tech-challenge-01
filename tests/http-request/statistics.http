@@ -1,0 +1,17 @@
+### Statistics API Endpoints
+
+### Get Overview Statistics
+GET {{baseUrl}}/api/v1/stats/overview
+Accept: {{contentType}}
+
+### Get Category Statistics (All Categories)
+GET {{baseUrl}}/api/v1/stats/categories
+Accept: {{contentType}}
+
+### Get Category Statistics (Specific Categories)
+GET {{baseUrl}}/api/v1/stats/categories?categories=Fiction,Mystery,Romance&include_distribution=true
+Accept: {{contentType}}
+
+### Get Category Statistics (Specific Categories without Distribution)
+GET {{baseUrl}}/api/v1/stats/categories?categories=Fiction,Poetry&include_distribution=false
+Accept: {{contentType}}

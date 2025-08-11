@@ -229,6 +229,55 @@ Or using make:
 make test
 ```
 
+## HTTP API Testing
+
+The project includes comprehensive HTTP request files for testing all API endpoints using VS Code's REST Client extension.
+
+### Quick Start
+
+1. **Install REST Client**: Install the [REST Client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) for VS Code
+2. **Navigate to tests**: Open any `.http` file in `tests/http-request/`
+3. **Select environment**: Choose "local" or "prod" from VS Code's status bar
+4. **Send requests**: Click "Send Request" above any HTTP request block
+
+### Available Test Files
+
+- **`core.http`** - Health checks, version, and basic endpoints
+- **`books.http`** - Book management, search, and filtering
+- **`categories.http`** - Category listing and statistics
+- **`statistics.http`** - Analytics and reporting endpoints
+- **`scraping.http`** - Web scraping operations
+- **`machine-learning.http`** - ML features and predictions
+- **`test-suite.http`** - Comprehensive workflow testing
+- **`quick-reference.http`** - Common requests for quick testing
+
+### Environment Configuration
+
+The `http-client.env.json` file provides two environments:
+- **`local`**: `http://localhost:8000` (development)
+- **`prod`**: `https://sixmlet-tech-challenge-01-latest.onrender.com` (production)
+
+Switch between environments using VS Code's environment selector in the status bar.
+
+### Example Usage
+
+```http
+### Get all books with pagination
+GET {{baseUrl}}/api/v1/books?page=1&limit=10
+Accept: {{contentType}}
+
+### Make a price prediction
+POST {{baseUrl}}/api/v1/ml/predictions
+Content-Type: {{contentType}}
+
+{
+  "title": "Python for Data Science",
+  "category": "Technology",
+  "rating": 5,
+  "availability": "In stock"
+}
+```
+
 ### Web Scraping System
 
 This project includes a comprehensive web scraping system for collecting book data from [books.toscrape.com](https://books.toscrape.com/).
