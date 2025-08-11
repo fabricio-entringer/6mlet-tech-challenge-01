@@ -31,7 +31,11 @@ from ..ml import (
 from ..utils import get_version
 from . import books, categories, category_stats, overview_stats, core, scraping
 
+import os
+
 app_version = get_version()
+
+endpoint = os.environ.get('ENDPOINT', 'http://localhost') + ':' + str(os.environ.get('PORT', 8000))
 
 # Enhanced OpenAPI configuration according to issue #26
 app = FastAPI(
@@ -149,12 +153,8 @@ app = FastAPI(
     redoc_url="/redoc",
     servers=[
         {
-            "url": "http://localhost:8000",
-            "description": "Development server"
-        },
-        {
-            "url": "https://api.books.example.com",
-            "description": "Production server"
+            "url": endpoint,
+            "description": "Default server"
         }
     ]
 )
