@@ -33,8 +33,6 @@ jobs:
       with:
         images: ${{ secrets.DOCKER_HUB_USERNAME }}/6mlet-tech-challenge-01
         tags: |
-          type=ref,event=branch
-          type=sha,prefix=sha-
           type=raw,value=${{ steps.version.outputs.version }},enable={{is_default_branch}}
 
     - name: Build and push Docker image

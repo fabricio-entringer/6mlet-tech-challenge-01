@@ -1,0 +1,13 @@
+### Categories API Endpoints
+
+### Get All Categories (Default: sorted by name, ascending)
+GET {{baseUrl}}/api/v1/categories
+Accept: {{contentType}}
+
+### Get Categories sorted by Count (Descending)
+GET {{baseUrl}}/api/v1/categories?sort=count&order=desc&include_stats=true
+Accept: {{contentType}}
+
+### Get Categories sorted by Name (Ascending) without Statistics
+GET {{baseUrl}}/api/v1/categories?sort=name&order=asc&include_stats=false
+Accept: {{contentType}}

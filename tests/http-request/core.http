@@ -1,0 +1,13 @@
+### Core API Endpoints
+
+### Get API Root/Welcome Message
+GET {{baseUrl}}/
+Accept: {{contentType}}
+
+### Get Application Version
+GET {{baseUrl}}/version
+Accept: {{contentType}}
+
+### Get Comprehensive Health Check
+GET {{baseUrl}}/api/v1/health
+Accept: {{contentType}}

@@ -1,0 +1,37 @@
+
+### Get All Books with Pagination
+GET {{baseUrl}}/api/v1/books?page=1&limit=20
+Accept: {{contentType}}
+
+### Get All Books with Filters
+GET {{baseUrl}}/api/v1/books?page=1&limit=10&category=Fiction&sort=price&order=asc&min_price=10&max_price=50&min_rating=3&availability=In%20stock
+Accept: {{contentType}}
+
+### Get Book by ID
+GET {{baseUrl}}/api/v1/books/1
+Accept: {{contentType}}
+
+### Get Top Rated Books
+GET {{baseUrl}}/api/v1/books/top-rated?limit=10
+Accept: {{contentType}}
+
+### Get Books by Price Range
+GET {{baseUrl}}/api/v1/books/price-range?min_price=20.0&max_price=40.0&page=1&limit=20&sort=price&order=asc
+Accept: {{contentType}}
+
+### Search Books by Title
+GET {{baseUrl}}/api/v1/books/search?title=Light&page=1&limit=20&sort=title&order=asc
+Accept: {{contentType}}
+
+### Search Books by Category
+GET {{baseUrl}}/api/v1/books/search?category=Poetry&page=1&limit=20&sort=title&order=asc
+Accept: {{contentType}}
+
+### Search Books by Title and Category
+GET {{baseUrl}}/api/v1/books/search?title=Harry&category=Fiction&page=1&limit=20&sort=title&order=asc
+Accept: {{contentType}}
+
+### Refresh Books Data Cache
+POST {{baseUrl}}/api/v1/books/refresh
+Accept: {{contentType}}
+Content-Type: {{contentType}}
