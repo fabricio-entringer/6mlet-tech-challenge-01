@@ -1,7 +1,7 @@
 # 6MLET Tech Challenge #1
 
-[![CI](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/CI/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
 [![Build and Test PR](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Build%20and%20Test%20PR/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
+[![Build and Push Docker Image](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
 
 <div align="center">
   <img src="assets/app-image.png" alt="6MLET Tech Challenge 01 Application" width="400">
@@ -14,7 +14,9 @@ Tech Challenge #1 - FIAP Machine Learning Engineering Postgraduate specializatio
 
 This project is a FastAPI application created for the 6MLET Tech Challenge - Delivery 01. It includes a simple REST API, comprehensive testing with pytest, version control using commitizen, and integrated machine learning capabilities.
 
-> **📚 Consolidated Documentation**: This README now includes all documentation previously distributed across multiple README files in the project, providing a complete reference in one location.
+> **� Production Deployment**: The application is deployed on [Render.com](https://render.com) using Docker Hub integration for automated deployments. Visit the live API at: <https://sixmlet-tech-challenge-01-latest.onrender.com>
+
+> **�📚 Consolidated Documentation**: This README now includes all documentation previously distributed across multiple README files in the project, providing a complete reference in one location.
 
 This delivery is from **Group #3**, with the following team members:
 - **Fabricio Entringer** 
@@ -71,27 +73,108 @@ This delivery is from **Group #3**, with the following team members:
 ## Project Structure
 
 ```text
-├── app/
+├── app/                      # Main application package
 │   ├── __init__.py
-│   └── main.py          # FastAPI application
-├── scripts/             # Web scraping and utility scripts
+│   ├── main.py              # Application entry point
+│   ├── utils.py             # Utility functions
+│   ├── api/                 # API endpoints
+│   │   ├── __init__.py
+│   │   ├── main.py          # FastAPI application and routing
+│   │   ├── core.py          # Core endpoints (root, health, version)
+│   │   ├── books.py         # Book-related endpoints
+│   │   ├── categories.py    # Category endpoints
+│   │   ├── category_stats.py # Category statistics
+│   │   ├── overview_stats.py # Overview statistics
+│   │   ├── scraping.py      # Web scraping endpoints
+│   │   └── health.py        # Health check utilities
+│   ├── data/                # Data layer and services
+│   │   ├── __init__.py
+│   │   ├── csv_loader.py    # CSV data loading
+│   │   ├── data_cache.py    # Data caching
+│   │   ├── data_service.py  # Data service layer
+│   │   └── data_validator.py # Data validation
+│   ├── ml/                  # Machine learning modules
+│   │   ├── __init__.py
+│   │   ├── feature_engineering.py # Feature processing
+│   │   ├── models.py        # ML model definitions
+│   │   ├── prediction_service.py # Prediction service
+│   │   ├── train_model.py   # Model training
+│   │   └── training_data.py # Training data preparation
+│   └── models/              # Pydantic models and schemas
+│       ├── __init__.py
+│       ├── book.py          # Book model
+│       ├── category.py      # Category model
+│       ├── category_stats.py # Category statistics models
+│       ├── overview_stats.py # Overview statistics models
+│       ├── health_response.py # Health response models
+│       ├── history_response.py # History response models
+│       ├── scraping_request.py # Scraping request models
+│       ├── scraping_response.py # Scraping response models
+│       ├── status_response.py # Status response models
+│       └── execution_history_item.py # Execution history models
+├── scripts/                  # Web scraping and utility scripts
 │   ├── __init__.py
-│   ├── books_scraper.py # Main scraper implementation
-│   ├── scraper_api.py   # API interface for CLI and programmatic use
-│   ├── run_scraper.py   # CLI interface for scraper
-│   ├── config.py        # Scraper configuration
-│   └── README.md        # Scraper documentation
-├── tests/
+│   ├── books_scraper.py     # Main scraper implementation
+│   ├── scraper_api.py       # API interface for CLI and programmatic use
+│   ├── run_scraper.py       # CLI interface for scraper
+│   ├── config.py            # Scraper configuration
+│   ├── book_sequence.py     # Book sequence utilities
+│   ├── history_logger.py    # History logging
+│   └── view_history.py      # History viewing utilities
+├── tests/                    # Test suite
 │   ├── __init__.py
-│   ├── test_main.py     # API test cases
+│   ├── test_main.py         # Main API test cases
+│   ├── test_books.py        # Books endpoint tests
+│   ├── test_categories.py   # Categories endpoint tests
+│   ├── test_category_stats.py # Category stats tests
+│   ├── test_overview_stats.py # Overview stats tests
+│   ├── test_overview_stats_integration.py # Integration tests
+│   ├── test_health_endpoint.py # Health endpoint tests
+│   ├── test_data_layer.py   # Data layer tests
 │   ├── test_books_scraper.py # Scraper test cases
-│   └── test_scraper_api.py   # Scraper API test cases
-├── data/                # Output directory for scraped data (gitignored)
-├── logs/                # Log files directory (gitignored)
-├── assets/              # Project assets
-├── requirements.txt     # Python dependencies
-├── pyproject.toml       # Project configuration
-├── demo_api_usage.py    # API usage demonstration script
+│   ├── test_scraper_api.py  # Scraper API test cases
+│   ├── test_top_rated_books.py # Top rated books tests
+│   ├── fixtures/            # Test fixtures and data
+│   └── http-request/        # HTTP client test files
+│       ├── http-client.env.json # Environment configuration
+│       ├── core.http        # Core endpoint tests
+│       ├── books.http       # Books endpoint tests
+│       ├── categories.http  # Categories endpoint tests
+│       ├── statistics.http  # Statistics endpoint tests
+│       ├── scraping.http    # Scraping endpoint tests
+│       └── machine-learning.http # ML endpoint tests
+├── .github/                  # GitHub configuration
+│   ├── workflows/           # CI/CD workflows
+│   │   ├── branch-protection.yml # Branch protection workflow
+│   │   ├── deploy.yml       # Deployment workflow
+│   │   ├── docker-build-push.yml # Docker build workflow
+│   │   └── pr-build-test.yml # PR testing workflow
+│   └── ISSUE_TEMPLATE/      # Issue templates
+│       ├── bug_report.yml   # Bug report template
+│       ├── improvement.yml  # Feature request template
+│       ├── task.yml         # Task template
+│       └── config.yml       # Issue template configuration
+├── .vscode/                  # VS Code configuration
+│   └── settings.json        # Editor settings and preferences
+├── assets/                   # Project assets
+│   ├── app-image.png        # Application screenshot
+│   └── tech_challenge_fase_1.md # Challenge documentation
+├── data/                     # Data files (gitignored in production)
+│   ├── sample_books_data.csv # Sample data file
+│   └── scraping_history.csv # Scraping execution history
+├── infra/                    # Infrastructure configuration
+│   ├── Dockerfile           # Docker container configuration
+│   ├── docker-compose.yml   # Docker composition file
+│   ├── .dockerignore        # Docker ignore file
+│   └── .env.example         # Environment variables template
+├── logs/                     # Log files directory (gitignored)
+├── requirements.txt          # Python dependencies
+├── pyproject.toml           # Project configuration
+├── pytest.ini              # Pytest configuration  
+├── run.py                   # Application runner
+├── Makefile                 # Development commands
+├── CHANGELOG.md             # Version history
+└── LICENSE                  # MIT License
 ```
 
 ## Web Scraping System
@@ -101,20 +184,22 @@ The project includes a comprehensive web scraping system for extracting book dat
 ### Quick Start
 
 ```bash
-# Scrape all books (recommended API interface)
-python scripts/scraper_api.py
+# Scrape all books using the recommended API interface
+python -c "
+from scripts.scraper_api import BooksScraperAPI
+api = BooksScraperAPI()
+result = api.scrape_all_books()
+print(f'Scraped {result[\"total_books\"]} books')
+"
 
-# Get available categories
-python scripts/scraper_api.py --mode categories
+# Or use the CLI interface
+python scripts/run_scraper.py
 
-# Scrape a specific category
-python scripts/scraper_api.py --mode category --category "Fiction"
+# CLI with custom options
+python scripts/run_scraper.py --delay 2.0 --output my_data --filename custom_books.csv
 
-# Scrape a sample of books
-python scripts/scraper_api.py --mode sample --max-books 50
-
-# Demonstrate programmatic usage
-python demo_api_usage.py
+# Enable verbose logging
+python scripts/run_scraper.py --verbose
 ```
 
 ### Key Scraper Features
@@ -127,8 +212,6 @@ python demo_api_usage.py
 - **Data Export**: CSV format with organized output
 - **Detailed Logging**: Comprehensive logging and statistics
 - **Flexible Usage**: Sample scraping, category-specific scraping, full scraping
-
-For detailed documentation, see [`scripts/README.md`](scripts/README.md).
 
 ## Installation
 
@@ -174,7 +257,7 @@ pip install -r requirements.txt
 
 ## API Endpoints
 
-**🌐 Production URL**: <https://6mlet-tech-challenge-01.up.railway.app>
+**🌐 Production URL**: <https://sixmlet-tech-challenge-01-latest.onrender.com>
 
 ### Core Endpoints
 
@@ -182,19 +265,19 @@ pip install -r requirements.txt
   - **Description**: Returns a welcome message for the API
   - **Response**: `{"message": "Welcome to 6MLET Tech Challenge 01 API"}`
   - **Status Code**: 200
-  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/>
+  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/>
 
 - **`GET /health`** - Health check endpoint
   - **Description**: Returns the current health status of the service
   - **Response**: `{"status": "healthy"}`
   - **Status Code**: 200
-  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/health>
+  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/health>
 
 - **`GET /version`** - Version endpoint
   - **Description**: Returns the current application version from pyproject.toml
   - **Response**: `{"version": "x.x.x"}`
   - **Status Code**: 200
-  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/version>
+  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/version>
 
 ### API Documentation
 
@@ -204,23 +287,48 @@ The FastAPI application automatically generates comprehensive API documentation 
   - Try out endpoints directly from the browser
   - View request/response schemas
   - Test API calls with real-time responses
-  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/docs>
+  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/docs>
 
 - **Alternative Documentation (ReDoc)**: `http://localhost:8000/redoc`
   - Clean, responsive documentation interface
   - Detailed endpoint descriptions and examples
   - Schema definitions and models
-  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/redoc>
+  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/redoc>
 
 - **OpenAPI JSON Schema**: `http://localhost:8000/openapi.json`
   - Raw OpenAPI specification in JSON format
   - Can be imported into other API tools (Postman, Insomnia, etc.)
-  - **Production**: <https://6mlet-tech-challenge-01.up.railway.app/openapi.json>
+  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/openapi.json>
 
-### ML-Ready Endpoints
+### All API Endpoints
 
-The API includes machine learning endpoints designed for book price prediction:
+#### Core Endpoints
+- **`GET /`** - Root endpoint (Welcome message)
+- **`GET /health`** - Health check endpoint
+- **`GET /api/v1/health`** - Versioned health check endpoint  
+- **`GET /version`** - Application version from pyproject.toml
 
+#### Scraping Endpoints
+- **`POST /scraping/start`** - Start web scraping process
+- **`GET /scraping/history`** - Get scraping execution history
+- **`GET /scraping/status`** - Get current scraping status
+
+#### Category Endpoints
+- **`GET /api/v1/categories`** - List all available book categories
+- **`GET /api/v1/stats/categories`** - Category statistics and counts
+
+#### Statistics Endpoints
+- **`GET /api/v1/stats/overview`** - Overview statistics for the dataset
+
+#### Book Endpoints
+- **`GET /api/v1/books`** - List books with pagination and filtering
+- **`GET /api/v1/books/top-rated`** - Get top-rated books
+- **`GET /api/v1/books/price-range`** - Get books within price range
+- **`GET /api/v1/books/search`** - Search books by title, category, etc.
+- **`GET /api/v1/books/{book_id}`** - Get specific book details
+- **`POST /api/v1/books/refresh`** - Refresh books data
+
+#### Machine Learning Endpoints
 - **`GET /api/v1/ml/features`** - Feature vectors for ML models
   - **Description**: Returns preprocessed features ready for machine learning
   - **Query Parameters**: 
@@ -282,8 +390,6 @@ The project includes comprehensive HTTP request files for testing all API endpoi
 - **`statistics.http`** - Analytics and reporting endpoints
 - **`scraping.http`** - Web scraping operations
 - **`machine-learning.http`** - ML features and predictions
-- **`test-suite.http`** - Comprehensive workflow testing
-- **`quick-reference.http`** - Common requests for quick testing
 
 ### Environment Configuration
 
@@ -365,58 +471,39 @@ The `scraper_api.py` provides both command line and programmatic interfaces:
 # Navigate to the scripts directory
 cd scripts
 
-# Scrape all books (default mode)
-python scraper_api.py
-
-# Get available categories
-python scraper_api.py --mode categories
-
-# Scrape a specific category
-python scraper_api.py --mode category --category "Fiction"
-
-# Scrape a sample of books
-python scraper_api.py --mode sample --max-books 100
+# Scrape all books with default settings
+python run_scraper.py
 
 # Customize scraping parameters
-python scraper_api.py --delay 0.5 --max-retries 2 --timeout 15
+python run_scraper.py --delay 0.5 --max-retries 2 --timeout 15
 
-# Skip saving to CSV
-python scraper_api.py --no-save
+# Custom output directory and filename
+python run_scraper.py --output my_data --filename custom_books.csv
+
+# Enable verbose logging
+python run_scraper.py --verbose
 
 # Show help
-python scraper_api.py --help
+python run_scraper.py --help
 ```
 
 #### Programmatic Usage
 
 ```python
-from scraper_api import BooksScraperAPI
+from scripts.scraper_api import BooksScraperAPI
 
-# Create API instance
-api = BooksScraperAPI(delay=1.0, max_retries=3, timeout=10)
+# Initialize the scraper
+scraper_api = BooksScraperAPI()
 
 # Scrape all books
-result = api.scrape_all_books()
-print(f"Scraped {result['total_books']} books")
-print(f"Categories: {result['total_categories']}")
-print(f"Data saved to: {result['csv_file']}")
+result = scraper_api.scrape_all_books()
+print(f"Scraping completed. Total books: {result['books_scraped']}")
 
-# Get available categories
-categories = api.get_categories()
-for cat in categories:
-    print(f"- {cat['name']}: {cat['url']}")
-
-# Scrape a specific category
-fiction_result = api.scrape_category("Fiction")
-print(f"Fiction books: {fiction_result['total_books']}")
-
-# Scrape a sample
-sample_result = api.scrape_sample(max_books=50)
-print(f"Sample: {sample_result['total_books']} books")
-
-# Get last scraping statistics
-stats = api.get_scraper_stats()
-print(f"Statistics: {stats}")
+# Get the last scraping result
+last_result = scraper_api.get_last_result()
+print(f"Status: {last_result['status']}")
+if last_result['books']:
+    print(f"Books found: {len(last_result['books'])}")
 ```
 
 ### Basic Scraper Usage
@@ -590,17 +677,11 @@ python scripts/run_scraper.py --verbose
 
 ## CI/CD Workflows
 
-This project includes comprehensive GitHub Actions workflows for continuous integration and deployment:
+This project includes comprehensive GitHub Actions workflows for continuous integration and deployment with Docker Hub integration:
 
 ### Available Workflows
 
-1. **CI Workflow** (`.github/workflows/ci.yml`)
-   - Runs on every push and pull request to `main` and `develop` branches
-   - Tests with Python 3.12
-   - Runs the full test suite
-   - Validates app import functionality
-
-2. **Build and Test PR Workflow** (`.github/workflows/pr-build-test.yml`)
+1. **Build and Test PR Workflow** (`.github/workflows/pr-build-test.yml`)
    - Comprehensive PR validation workflow
    - **Multi-version testing**: Tests with Python 3.11 and 3.12
    - **Build validation**: Creates and validates package builds
@@ -609,22 +690,59 @@ This project includes comprehensive GitHub Actions workflows for continuous inte
    - **Application testing**: Validates the application starts correctly and endpoints respond
    - **Summary report**: Provides a comprehensive summary of all checks
 
+2. **Branch Protection Workflow** (`.github/workflows/branch-protection.yml`)
+   - **Git Flow Enforcement**: Ensures only `develop` branch can merge to `master`
+   - **PR Validation**: Blocks invalid merge attempts with clear error messages
+   - **Workflow Security**: Prevents accidental direct merges to production branch
+
+3. **Docker Build and Push Workflow** (`.github/workflows/docker-build-push.yml`)
+   - **Triggers**: Runs on push to `master` branch
+   - **Docker Image Build**: Creates optimized production Docker image with version tagging from `pyproject.toml`
+   - **Multi-Platform Support**: Builds for linux/amd64 and linux/arm64 architectures
+   - **Docker Hub Push**: Pushes tagged images to `entringer/6mlet-tech-challenge-01` repository
+   - **Cache Optimization**: Uses GitHub Actions cache for faster builds
+
+4. **Deploy to Render Workflow** (`.github/workflows/deploy.yml`)
+   - **Triggers**: Runs after successful completion of Docker build workflow
+   - **Render API Integration**: Uses Render API to trigger deployment with specific Docker image
+   - **Deployment Verification**: Validates deployment trigger and provides status information
+   - **Health Check Validation**: Verifies deployment success via health endpoints
+
 ### Workflow Features
 
 - **Dependency caching**: Speeds up workflow execution
 - **Matrix testing**: Tests across multiple Python versions
 - **Artifact storage**: Saves build artifacts for inspection
+- **Docker Integration**: Automated Docker image builds and pushes to Docker Hub
+- **Automated Deployment**: Seamless integration with Render.com for production deployments
 - **Status badges**: Available for README integration
 - **PR template**: Standardized pull request template for consistency
 
+### Deployment Pipeline
+
+**Production Deployment Flow**:
+```bash
+Code Push (master) → GitHub Actions → Docker Build → Docker Hub (entringer/6mlet-tech-challenge-01) → Render API → Live API
+```
+
+1. **Developer pushes code** to `master` branch
+2. **GitHub Actions** automatically builds versioned Docker image with multi-platform support
+3. **Docker Hub** stores the container image at `entringer/6mlet-tech-challenge-01:version`
+4. **Render API** is called to trigger deployment with the specific Docker image
+5. **Health checks** validate the deployment success
+
 ### Status Badges
 
-Add these badges to your repository by replacing `YOUR_USERNAME` with your GitHub username:
+Current project badges (ready to use):
 
 ```markdown
-[![CI](https://github.com/YOUR_USERNAME/6mlet-tech-challenge-01/workflows/CI/badge.svg)](https://github.com/YOUR_USERNAME/6mlet-tech-challenge-01/actions)
-[![Build and Test PR](https://github.com/YOUR_USERNAME/6mlet-tech-challenge-01/workflows/Build%20and%20Test%20PR/badge.svg)](https://github.com/YOUR_USERNAME/6mlet-tech-challenge-01/actions)
+[![Build and Test PR](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Build%20and%20Test%20PR/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
+[![Build and Push Docker Image](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
+[![Deploy to Render](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Deploy%20to%20Render/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
+[![Branch Protection](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Branch%20Protection/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
 ```
+
+**Docker Hub Repository**: [`entringer/6mlet-tech-challenge-01`](https://hub.docker.com/r/entringer/6mlet-tech-challenge-01)
 
 ## Version Control with Commitizen
 
@@ -768,6 +886,15 @@ When creating an issue, please:
 - beautifulsoup4 4.12.3+
 - lxml 5.2.2+
 - pandas 2.2.2+
+
+### Machine Learning Dependencies
+
+- numpy 1.26.4+
+- scikit-learn 1.5.0+
+
+### System Monitoring Dependencies
+
+- psutil 6.0.0+
 
 ## Machine Learning Endpoints Documentation
 
@@ -1127,7 +1254,7 @@ prediction = requests.post("https://api.example.com/api/v1/ml/predictions",
 
 ```
 ┌─────────────────┐
-│   Railway.app   │  ← Cloud deployment
+│   Render.com    │  ← Cloud deployment
 └────────┬────────┘
          │
 ┌────────▼────────┐
@@ -1224,12 +1351,12 @@ This section provides a comprehensive architectural overview of the 6MLET Tech C
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           PRODUCTION DEPLOYMENT                             │
-│                            (Railway.app/Render)                             │
+│                                (Render.com)                                 │
 └──────────────────────────────┬──────────────────────────────────────────────┘
                                │
 ┌──────────────────────────────▼──────────────────────────────────────────────┐
 │                              LOAD BALANCER                                  │
-│                         (Built-in Railway/Render)                           │
+│                           (Built-in Render)                                 │
 └──────────────────────────────┬──────────────────────────────────────────────┘
                                │
 ┌──────────────────────────────▼──────────────────────────────────────────────┐
@@ -1409,7 +1536,7 @@ USER 1001:1001
 2. **Deployment Pipeline**:
    - Automated Docker builds
    - Multi-platform support (linux/amd64, linux/arm64)
-   - Production deployment to Railway/Render
+   - Production deployment to Render.com
    - Health check validation
 
 ### Technology Stack Justification
@@ -1436,12 +1563,13 @@ USER 1001:1001
 - ✅ **Rate Limiting**: Built-in support for respectful crawling
 - ✅ **Error Handling**: Comprehensive exception handling
 
-#### Deployment: Railway.app/Render
+#### Deployment: Render.com
 **Justification**:
-- ✅ **Simplicity**: Git-based deployment workflow
+- ✅ **Simplicity**: Docker Hub integration with automated deployments
 - ✅ **Scalability**: Automatic scaling based on demand
 - ✅ **Cost-Effective**: Free tier suitable for demo projects
 - ✅ **Modern**: Docker support, environment variables, logs
+- ✅ **CI/CD Integration**: Seamless integration with Docker Hub for automated deployments
 
 ### Scalability Architecture for Future Growth
 
@@ -1707,7 +1835,7 @@ class APIClient:
 
 #### Current Performance Metrics
 
-**Response Times** (measured on Railway.app deployment):
+**Response Times** (measured on Render.com deployment):
 - `GET /health`: ~50ms
 - `GET /api/v1/books` (paginated): ~150ms
 - `GET /api/v1/ml/features`: ~200ms
@@ -1879,21 +2007,24 @@ if settings.environment == "production":
 
 #### Current Deployment Setup
 
-**Railway.app Deployment**:
+**Render.com Deployment with Docker Hub Integration**:
+
+The deployment process follows a CI/CD pipeline:
+
+1. **Docker Image Build**: GitHub Actions builds and pushes Docker image to Docker Hub
+2. **Automatic Deployment**: Render.com automatically deploys the latest image from Docker Hub
+
+**Render.com Service Configuration**:
+- **Service Type**: Web Service
+- **Docker Image**: `entringer/6mlet-tech-challenge-01:latest`
+- **Port**: 8000
+- **Environment**: Production
+- **Auto-Deploy**: Triggered via Render API (not automatic Docker Hub polling)
+
+**Environment Variables**:
 ```yaml
-# railway.toml
-[build]
-builder = "dockerfile"
-dockerfilePath = "infra/Dockerfile"
-
-[deploy]
-numReplicas = 1
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
-
-[env]
-PORT = "8000"
-ENVIRONMENT = "production"
+PORT=8000
+ENVIRONMENT=production
 ```
 
 **Container Configuration**:
@@ -1915,17 +2046,32 @@ CMD ["python", "run.py"]
 
 #### Production Deployment Architecture
 
+**CI/CD Pipeline with Docker Hub Integration**:
+
 ```
-                  ┌─────────────────────┐
-                  │   CDN/CloudFlare    │
-                  │   - Static assets   │
-                  │   - DDoS protection │
-                  │   - SSL termination │
-                  └──────────┬──────────┘
-                             │
-                  ┌──────────▼──────────┐
-                  │   Load Balancer     │
-                  │   (Railway/Render)  │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           DEPLOYMENT PIPELINE                              │
+└─────────────────────┬───────────────────────────────────────────────────────┘
+                      │
+    ┌─────────────────▼─────────────────┐
+    │         GitHub Actions            │
+    │  1. Build Docker Image            │
+    │  2. Push to Docker Hub            │
+    │  3. Trigger Render Deployment     │
+    └─────────────────┬─────────────────┘
+                      │
+    ┌─────────────────▼─────────────────┐
+    │         Docker Hub                │
+    │  - Image Repository               │
+    │  - Automated Image Storage        │
+    │  - Version Tagging                │
+    └─────────────────┬─────────────────┘
+                      │
+    ┌─────────────────▼─────────────────┐
+    │        Render.com                 │
+    │  - Auto-deploy from Docker Hub    │
+    │  - Load Balancer                  │
+    │  - SSL/TLS Termination            │
                   └──────────┬──────────┘
                              │
            ┌─────────────────┼─────────────────┐
@@ -1944,6 +2090,49 @@ CMD ["python", "run.py"]
                   │   Redis Cache       │
                   └─────────────────────┘
 ```
+
+#### Docker Hub + Render.com Deployment Workflow
+
+**Step-by-Step Process**:
+
+1. **Code Changes**: Developer pushes code to `master` branch
+2. **GitHub Actions** (`docker-build-push.yml`): 
+   ```yaml
+   # Actual workflow implementation
+   - name: Extract version from pyproject.toml
+     run: VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+   
+   - name: Build and push Docker image
+     uses: docker/build-push-action@v5
+     with:
+       context: .
+       file: ./infra/Dockerfile
+       platforms: linux/amd64,linux/arm64
+       push: true
+       tags: entringer/6mlet-tech-challenge-01:${{ steps.version.outputs.version }}
+   ```
+
+3. **Docker Hub**: Stores the versioned image at `entringer/6mlet-tech-challenge-01:version`
+4. **Deploy Workflow** (`deploy.yml`): Automatically triggered after successful Docker build
+   ```yaml
+   # Render API deployment trigger
+   - name: Deploy to Render
+     run: |
+       curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_PROJECT_ID }}/deploys" \
+       -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+       -d '{"clearCache": true, "image": "entringer/6mlet-tech-challenge-01:latest"}'
+   ```
+5. **Health Checks**: Render verifies the deployment with health endpoints
+
+**Benefits of This Approach**:
+- ✅ **Consistency**: Same Docker image across all environments
+- ✅ **Version Control**: Semantic versioning from pyproject.toml
+- ✅ **Multi-Platform**: Support for AMD64 and ARM64 architectures  
+- ✅ **API-Controlled**: Precise deployment control via Render API
+- ✅ **Speed**: Fast deployments using cached layers
+- ✅ **Reliability**: Two-stage workflow with dependency validation
+- ✅ **Monitoring**: Built-in logging and metrics from Render
+- ✅ **Cost-Effective**: No build time charges, only runtime costs
 
 #### Multi-Environment Strategy
 
