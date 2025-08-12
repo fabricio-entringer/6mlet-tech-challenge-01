@@ -35,7 +35,7 @@ import os
 
 app_version = get_version()
 
-endpoint = os.environ.get('ENDPOINT', 'http://localhost:8000'))
+endpoint = os.environ.get('ENDPOINT', 'http://localhost:8000')
 
 # Enhanced OpenAPI configuration according to issue #26
 app = FastAPI(
