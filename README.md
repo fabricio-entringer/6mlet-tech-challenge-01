@@ -14,7 +14,7 @@ Tech Challenge #1 - FIAP Machine Learning Engineering Postgraduate specializatio
 
 This project is a FastAPI application created for the 6MLET Tech Challenge - Delivery 01. It includes a simple REST API, comprehensive testing with pytest, version control using commitizen, and integrated machine learning capabilities.
 
-**Current Version**: 0.1.1
+**Current Version**: 0.1.2
 
 > **� Production Deployment**: The application is deployed on [Render.com](https://render.com) using Docker Hub integration for automated deployments. Visit the live API at: <https://sixmlet-tech-challenge-01-latest.onrender.com>
 
