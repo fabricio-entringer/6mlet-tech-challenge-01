@@ -14,6 +14,8 @@ Tech Challenge #1 - FIAP Machine Learning Engineering Postgraduate specializatio
 
 This project is a FastAPI application created for the 6MLET Tech Challenge - Delivery 01. It includes a simple REST API, comprehensive testing with pytest, version control using commitizen, and integrated machine learning capabilities.
 
+**Current Version**: 0.1.2
+
 > **� Production Deployment**: The application is deployed on [Render.com](https://render.com) using Docker Hub integration for automated deployments. Visit the live API at: <https://sixmlet-tech-challenge-01-latest.onrender.com>
 
 > **�📚 Consolidated Documentation**: This README now includes all documentation previously distributed across multiple README files in the project, providing a complete reference in one location.
@@ -31,10 +33,9 @@ This delivery is from **Group #3**, with the following team members:
 - [API Endpoints](#api-endpoints)
   - [Core Endpoints](#core-endpoints)
   - [API Documentation](#api-documentation)
-  - [ML-Ready Endpoints](#ml-ready-endpoints)
+  - [ML Endpoints Overview](#ml-endpoints-overview)
 - [Books Scraper System](#books-scraper-system)
   - [Scraper Features](#scraper-features)
-  - [REST API Endpoints for Scraping](#rest-api-endpoints-for-scraping)
   - [Scraper API (Recommended)](#scraper-api-recommended)
   - [Basic Scraper Usage](#basic-scraper-usage)
   - [Scraper Configuration](#scraper-configuration)
@@ -183,15 +184,27 @@ The project includes a comprehensive web scraping system for extracting book dat
 
 ### Quick Start
 
+**🚀 REST API Method (Recommended - No Local Setup Required):**
 ```bash
-# Scrape all books using the recommended API interface
-python -c "
-from scripts.scraper_api import BooksScraperAPI
-api = BooksScraperAPI()
-result = api.scrape_all_books()
-print(f'Scraped {result[\"total_books\"]} books')
-"
+# Start the scraping via REST API call
+curl -X POST "https://sixmlet-tech-challenge-01-latest.onrender.com/scraping/start" \
+  -H "Content-Type: application/json" \
+  -d '{                                   \
+        "csv_filename": "books_data.csv", \
+        "delay": 1,                       \
+        "max_retries": 3,                 \
+        "timeout": 10                     \
+      }'
 
+# Check scraping status
+curl "https://sixmlet-tech-challenge-01-latest.onrender.com/scraping/status"
+
+# View scraping history
+curl "https://sixmlet-tech-challenge-01-latest.onrender.com/scraping/history"
+```
+
+**📟 CLI Method (Local Execution):**
+```bash
 # Or use the CLI interface
 python scripts/run_scraper.py
 
@@ -201,17 +214,6 @@ python scripts/run_scraper.py --delay 2.0 --output my_data --filename custom_boo
 # Enable verbose logging
 python scripts/run_scraper.py --verbose
 ```
-
-### Key Scraper Features
-
-- **Complete Data Extraction**: Scrapes all books with pagination support
-- **Multiple Interfaces**: CLI and programmatic API access
-- **Comprehensive Data**: Title, price, rating, availability, category, image URL
-- **Robust Error Handling**: Retry mechanisms and graceful error recovery
-- **Rate Limiting**: Respectful crawling with configurable delays
-- **Data Export**: CSV format with organized output
-- **Detailed Logging**: Comprehensive logging and statistics
-- **Flexible Usage**: Sample scraping, category-specific scraping, full scraping
 
 ## Installation
 
@@ -251,9 +253,9 @@ pip install -r requirements.txt
    make run
    ```
 
-2. The API will be available at: `http://localhost:8000`
-3. Interactive API documentation: `http://localhost:8000/docs`
-4. Alternative API documentation: `http://localhost:8000/redoc`
+2. The API will be available at: `https://sixmlet-tech-challenge-01-latest.onrender.com`
+3. Interactive API documentation: `https://sixmlet-tech-challenge-01-latest.onrender.com/docs`
+4. Alternative API documentation: `https://sixmlet-tech-challenge-01-latest.onrender.com/redoc`
 
 ## API Endpoints
 
@@ -265,97 +267,49 @@ pip install -r requirements.txt
   - **Description**: Returns a welcome message for the API
   - **Response**: `{"message": "Welcome to 6MLET Tech Challenge 01 API"}`
   - **Status Code**: 200
-  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/>
 
-- **`GET /health`** - Health check endpoint
-  - **Description**: Returns the current health status of the service
-  - **Response**: `{"status": "healthy"}`
-  - **Status Code**: 200
-  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/health>
+- **`GET /api/v1/health`** - Health check endpoint
+  - **Description**: Returns comprehensive health status including system components, data statistics, and resource monitoring
+  - **Response**: Detailed health information with component status, data metrics, and system resources
+  - **Status Code**: 200 (healthy/degraded) or 503 (unhealthy)
 
 - **`GET /version`** - Version endpoint
   - **Description**: Returns the current application version from pyproject.toml
   - **Response**: `{"version": "x.x.x"}`
   - **Status Code**: 200
-  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/version>
+
+### Books Endpoints
+
+- **`GET /api/v1/books`** - List books with filtering and pagination
+- **`GET /api/v1/books/{book_id}`** - Get specific book by ID
+- **`GET /api/v1/books/search`** - Search books by title, category, or other criteria
+- **`GET /api/v1/books/top-rated`** - Get top-rated books
+- **`GET /api/v1/books/price-range`** - Get books filtered by price range
+- **`POST /api/v1/books/refresh`** - Refresh book data cache
+
+### Statistics & Categories
+
+- **`GET /api/v1/categories`** - List all book categories
+- **`GET /api/v1/stats/categories`** - Get detailed category statistics
+- **`GET /api/v1/stats/overview`** - Get overview statistics of the entire dataset
 
 ### API Documentation
 
 The FastAPI application automatically generates comprehensive API documentation using OpenAPI (Swagger) specifications:
 
-- **Interactive Documentation (Swagger UI)**: `http://localhost:8000/docs`
+- **Interactive Documentation (Swagger UI)**: `https://sixmlet-tech-challenge-01-latest.onrender.com/docs`
   - Try out endpoints directly from the browser
   - View request/response schemas
   - Test API calls with real-time responses
-  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/docs>
 
-- **Alternative Documentation (ReDoc)**: `http://localhost:8000/redoc`
+- **Alternative Documentation (ReDoc)**: `https://sixmlet-tech-challenge-01-latest.onrender.com/redoc`
   - Clean, responsive documentation interface
   - Detailed endpoint descriptions and examples
   - Schema definitions and models
-  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/redoc>
 
-- **OpenAPI JSON Schema**: `http://localhost:8000/openapi.json`
+- **OpenAPI JSON Schema**: `https://sixmlet-tech-challenge-01-latest.onrender.com/openapi.json`
   - Raw OpenAPI specification in JSON format
   - Can be imported into other API tools (Postman, Insomnia, etc.)
-  - **Production**: <https://sixmlet-tech-challenge-01-latest.onrender.com/openapi.json>
-
-### All API Endpoints
-
-#### Core Endpoints
-- **`GET /`** - Root endpoint (Welcome message)
-- **`GET /health`** - Health check endpoint
-- **`GET /api/v1/health`** - Versioned health check endpoint  
-- **`GET /version`** - Application version from pyproject.toml
-
-#### Scraping Endpoints
-- **`POST /scraping/start`** - Start web scraping process
-- **`GET /scraping/history`** - Get scraping execution history
-- **`GET /scraping/status`** - Get current scraping status
-
-#### Category Endpoints
-- **`GET /api/v1/categories`** - List all available book categories
-- **`GET /api/v1/stats/categories`** - Category statistics and counts
-
-#### Statistics Endpoints
-- **`GET /api/v1/stats/overview`** - Overview statistics for the dataset
-
-#### Book Endpoints
-- **`GET /api/v1/books`** - List books with pagination and filtering
-- **`GET /api/v1/books/top-rated`** - Get top-rated books
-- **`GET /api/v1/books/price-range`** - Get books within price range
-- **`GET /api/v1/books/search`** - Search books by title, category, etc.
-- **`GET /api/v1/books/{book_id}`** - Get specific book details
-- **`POST /api/v1/books/refresh`** - Refresh books data
-
-#### Machine Learning Endpoints
-- **`GET /api/v1/ml/features`** - Feature vectors for ML models
-  - **Description**: Returns preprocessed features ready for machine learning
-  - **Query Parameters**: 
-    - `sample_size`: Number of samples to return
-    - `shuffle`: Whether to shuffle the data
-    - `include_metadata`: Include feature engineering metadata
-  - **Response**: Feature vectors with normalization and one-hot encoding applied
-
-- **`GET /api/v1/ml/training-data`** - Training data with train/test split
-  - **Description**: Returns data ready for model training with sklearn
-  - **Query Parameters**:
-    - `test_size`: Proportion for test set (default: 0.2)
-    - `random_state`: Random seed for reproducibility
-  - **Response**: X_train, y_train, X_test, y_test arrays
-
-- **`POST /api/v1/ml/predictions`** - Price prediction endpoint
-  - **Description**: Predicts book price based on features
-  - **Request Body**:
-    ```json
-    {
-      "title": "Book Title",
-      "category": "Fiction",
-      "rating": 4,
-      "availability": "In stock"
-    }
-    ```
-  - **Response**: Predicted price with confidence interval
 
 ## Testing
 
@@ -379,7 +333,7 @@ The project includes comprehensive HTTP request files for testing all API endpoi
 
 1. **Install REST Client**: Install the [REST Client extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) for VS Code
 2. **Navigate to tests**: Open any `.http` file in `tests/http-request/`
-3. **Select environment**: Choose "local" or "prod" from VS Code's status bar
+3. **Select environment**: Choose "production" from VS Code's status bar
 4. **Send requests**: Click "Send Request" above any HTTP request block
 
 ### Available Test Files
@@ -393,9 +347,8 @@ The project includes comprehensive HTTP request files for testing all API endpoi
 
 ### Environment Configuration
 
-The `http-client.env.json` file provides two environments:
-- **`local`**: `http://localhost:8000` (development)
-- **`prod`**: `https://sixmlet-tech-challenge-01-latest.onrender.com` (production)
+The `http-client.env.json` file provides production environment configuration:
+- **`production`**: `https://sixmlet-tech-challenge-01-latest.onrender.com`
 
 Switch between environments using VS Code's environment selector in the status bar.
 
@@ -422,6 +375,8 @@ Content-Type: {{contentType}}
 
 A comprehensive web scraping system to extract book data from [books.toscrape.com](https://books.toscrape.com/).
 
+> **🚀 REST API Integration**: You can trigger scraping operations remotely via REST API calls! No need to run scripts locally - simply make HTTP requests to start, monitor, and manage scraping operations through the API.
+
 ### Scraper Features
 
 - ✅ **Complete Data Extraction**: Extracts all books from all categories with pagination support
@@ -432,34 +387,8 @@ A comprehensive web scraping system to extract book data from [books.toscrape.co
 - ✅ **Detailed Logging**: Comprehensive logging for monitoring and debugging
 - ✅ **Statistics**: Provides detailed statistics about scraped data
 - ✅ **CLI Interface**: Easy-to-use command-line interface
-
-### REST API Endpoints for Scraping
-
-The system includes REST API endpoints for remote scraping operations:
-
-#### Start the API Server
-```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-#### Available Endpoints
-
-1. **Start Scraping**: `POST /scraping/start`
-   ```bash
-   curl -X POST "http://localhost:8000/scraping/start" \
-     -H "Content-Type: application/json" \
-     -d '{"delay": 1.0, "csv_filename": "api_books.csv"}'
-   ```
-
-2. **Get History**: `GET /scraping/history`
-   ```bash
-   curl "http://localhost:8000/scraping/history"
-   ```
-
-3. **Check Status**: `GET /scraping/status`
-   ```bash
-   curl "http://localhost:8000/scraping/status"
-   ```
+- ✅ **REST API Integration**: Start, monitor, and control scraping operations via HTTP endpoints
+- ✅ **Remote Scraping**: Trigger scraping from any client that can make HTTP requests
 
 ### Scraper API (Recommended)
 
@@ -731,17 +660,6 @@ Code Push (master) → GitHub Actions → Docker Build → Docker Hub (entringer
 4. **Render API** is called to trigger deployment with the specific Docker image
 5. **Health checks** validate the deployment success
 
-### Status Badges
-
-Current project badges (ready to use):
-
-```markdown
-[![Build and Test PR](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Build%20and%20Test%20PR/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
-[![Build and Push Docker Image](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
-[![Deploy to Render](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Deploy%20to%20Render/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
-[![Branch Protection](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/workflows/Branch%20Protection/badge.svg)](https://github.com/fabricio-entringer/6mlet-tech-challenge-01/actions)
-```
-
 **Docker Hub Repository**: [`entringer/6mlet-tech-challenge-01`](https://hub.docker.com/r/entringer/6mlet-tech-challenge-01)
 
 ## Version Control with Commitizen
@@ -790,7 +708,7 @@ This project includes a Makefile that provides convenient shortcuts for common d
   ```bash
   make run
   ```
-  Launches the FastAPI application using the `run.py` script. The server will be available at `http://localhost:8000` with automatic API documentation at `http://localhost:8000/docs`.
+  Launches the FastAPI application using the `run.py` script. The production server is available at `https://sixmlet-tech-challenge-01-latest.onrender.com` with automatic API documentation.
 
 #### Maintenance
 
@@ -920,7 +838,7 @@ Returns preprocessed feature vectors ready for machine learning models.
 
 **Example Request:**
 ```bash
-curl "http://localhost:8000/api/v1/ml/features?sample_size=10&shuffle=true"
+curl "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/features?sample_size=10&shuffle=true"
 ```
 
 **Example Response:**
@@ -958,7 +876,7 @@ Returns data in sklearn-ready format with train/test split.
 
 **Example Request:**
 ```bash
-curl "http://localhost:8000/api/v1/ml/training-data?test_size=0.3&random_state=123"
+curl "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/training-data?test_size=0.3&random_state=123"
 ```
 
 **Example Response:**
@@ -999,7 +917,7 @@ Makes price predictions for a book based on its features.
 
 **Example Request:**
 ```bash
-curl -X POST "http://localhost:8000/api/v1/ml/predictions" \
+curl -X POST "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/predictions" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Python for Data Science",
@@ -1064,25 +982,25 @@ python app/ml/train_model.py
 #### Getting Feature Vectors
 ```bash
 # Get a small sample of features with metadata
-curl "http://localhost:8000/api/v1/ml/features?sample_size=10&include_metadata=true"
+curl "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/features?sample_size=10&include_metadata=true"
 
 # Get all features without metadata
-curl "http://localhost:8000/api/v1/ml/features?include_metadata=false"
+curl "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/features?include_metadata=false"
 ```
 
 #### Getting Training Data
 ```bash
 # Standard train/test split (80/20)
-curl "http://localhost:8000/api/v1/ml/training-data"
+curl "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/training-data"
 
 # Custom split (70/30) with specific random seed
-curl "http://localhost:8000/api/v1/ml/training-data?test_size=0.3&random_state=42"
+curl "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/training-data?test_size=0.3&random_state=42"
 ```
 
 #### Making Predictions
 ```bash
 # Science book prediction
-curl -X POST "http://localhost:8000/api/v1/ml/predictions" \
+curl -X POST "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/predictions" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Machine Learning Fundamentals",
@@ -1092,7 +1010,7 @@ curl -X POST "http://localhost:8000/api/v1/ml/predictions" \
   }'
 
 # Fiction book prediction
-curl -X POST "http://localhost:8000/api/v1/ml/predictions" \
+curl -X POST "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/predictions" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "The Great Adventure",
@@ -1102,7 +1020,7 @@ curl -X POST "http://localhost:8000/api/v1/ml/predictions" \
   }'
 
 # Food & Drink book prediction
-curl -X POST "http://localhost:8000/api/v1/ml/predictions" \
+curl -X POST "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/predictions" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Learn to Cook",
@@ -1142,7 +1060,7 @@ from sklearn.ensemble import RandomForestRegressor
 import numpy as np
 
 # 1. Get training data from API
-response = requests.get("http://localhost:8000/api/v1/ml/training-data")
+response = requests.get("https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/training-data")
 data = response.json()
 
 # 2. Train model locally
@@ -1155,7 +1073,7 @@ print(f"Model R² Score: {score:.4f}")
 
 # 4. Test with API predictions
 prediction_response = requests.post(
-    "http://localhost:8000/api/v1/ml/predictions",
+    "https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/ml/predictions",
     json={
         "title": "Advanced Python Programming",
         "category": "Science",
@@ -1365,7 +1283,7 @@ This section provides a comprehensive architectural overview of the 6MLET Tech C
 │  │                        API LAYER                                        ││
 │  │  ┌────────────────┬────────────────┬─────────────────┬─────────────────┐││
 │  │  │  Core Routes   │   Book APIs    │  Category APIs  │   ML APIs       │││
-│  │  │  /health       │   /books       │  /categories    │  /ml/features   │││
+│  │  │  /api/v1/health│   /books       │  /categories    │  /ml/features   │││
 │  │  │  /version      │   /books/{id}  │  /stats         │  /ml/training   │││
 │  │  │  /             │   /search      │                 │  /ml/predict    │││
 │  │  └────────────────┴────────────────┴─────────────────┴─────────────────┘││
@@ -1488,14 +1406,19 @@ for attempt in range(max_retries):
 ```python
 # Core System
 GET  /                    # Welcome message
-GET  /health              # Health monitoring
+GET  /api/v1/health       # Health monitoring
 GET  /version             # Application version
 
 # Data Access
 GET  /api/v1/books        # Book catalog with pagination
 GET  /api/v1/books/{id}   # Individual book details
+GET  /api/v1/books/search # Book search functionality
+GET  /api/v1/books/top-rated # Top-rated books
+GET  /api/v1/books/price-range # Books by price range
 GET  /api/v1/categories   # Category management
-GET  /api/v1/stats/*      # Analytics and insights
+GET  /api/v1/stats/categories # Category statistics
+GET  /api/v1/stats/overview # Overview statistics
+POST /api/v1/books/refresh # Refresh data cache
 
 # ML Pipeline
 GET  /api/v1/ml/features      # Feature vectors
@@ -1836,7 +1759,7 @@ class APIClient:
 #### Current Performance Metrics
 
 **Response Times** (measured on Render.com deployment):
-- `GET /health`: ~50ms
+- `GET /api/v1/health`: ~50ms
 - `GET /api/v1/books` (paginated): ~150ms
 - `GET /api/v1/ml/features`: ~200ms
 - `POST /api/v1/ml/predictions`: ~100ms
@@ -2038,7 +1961,7 @@ USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health')"
+    CMD python -c "import requests; requests.get('https://sixmlet-tech-challenge-01-latest.onrender.com/api/v1/health')"
 
 # Production command
 CMD ["python", "run.py"]
