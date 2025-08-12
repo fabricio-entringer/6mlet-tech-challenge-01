@@ -8,7 +8,7 @@
 </div>
 
 <br/>
-Tech Challenge #1 - FIAP Machine Learning Engineering Postgraduate specialization course
+Tech Challenge #1 - FIAP Machine Learning Engineering Postgraduate specialization course.
 
 ## Overview
 
